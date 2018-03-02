@@ -2,7 +2,7 @@
   <div>
     <right-bar></right-bar>
     <table>
-      <tr v-for="(data, index) in xs" v-bind:key='index' v-on:click="onClick(data, index)" v-bind:class="{'table-danger':flag == index}">
+      <tr v-for="(data, index) in xs" v-bind:key='index' v-on:click="onClick(data, index)" v-bind:class="{'table-danger':flag == index}" id="library-rightpanel">
         <td v-for="(field, index) in data" v-bind:key='index'>{{data[index]}}</td>
       </tr>
     </table>
@@ -47,8 +47,8 @@
       onClick: function (data, index) {
         this.flag = index
         // console.log(this.$store.state.System.table[n])
-        this.$store.commit('GET_FIELD', data);
-        this.$store.commit('GET_FIELD_INDEX', index);
+        this.$store.commit('LIBRARY_GET_FIELD', data);
+        this.$store.commit('LIBRARY_GET_FIELD_INDEX', index);
       },
     },
   };
