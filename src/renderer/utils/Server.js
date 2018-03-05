@@ -15,6 +15,7 @@ export function sConnect(obj, data) {
     if (res.status === 200) {
       if (res.data.success) {
         obj.$store.commit('SYSTEM_SET_SERVER_STATUS', [data[2], '连接成功'])
+        obj.$store.commit('SET_NOTICE', '连接成功')
       } else {
         obj.$store.commit('SYSTEM_SET_SERVER_STATUS', [data[2], '连接失败'])
       }
@@ -26,7 +27,7 @@ export function sConnect(obj, data) {
     obj.$store.commit('SYSTEM_SET_SERVER_STATUS', [data[2], '连接失败'])
   })
 }
-
+// ------------用户管理
 // 注册
 export function sRegister(obj, data) {
   // 取出user
@@ -77,8 +78,10 @@ export function sLogin(obj, data) {
   }).then((res) => {
     if (res.data.login) {
       obj.$store.commit('SYSTEM_SET_USER', ['用户登录成功', res.data])
+      obj.$store.commit('SET_NOTICE', '用户登录成功')
     } else {
       obj.$store.commit('SYSTEM_SET_USER', ['用户名或密码错误', res.data])
+      obj.$store.commit('SET_NOTICE', '用户登录成功')
     }
   }).catch((err) => {
     console.log(err)
@@ -99,22 +102,22 @@ export function sGetUsers(obj, data) {
       console.log(err);
     });
 }
-
 // 更新用户信息
 export function sUpdateUser(obj, data) {
   axios({
     method: 'post',
-    url: `http://${data[0]}:${data[1]}/servers/user/1`,
-    data: qs.stringify({ user: { age: 21 } }),
+    url: `http://${data[0]}:${data[1]}/servers/user/${data[2]}`,
+    data: qs.stringify({ user: data[3] }),
     headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
     responseType: 'json'
   }).then((res) => {
-    console.log(res)
+    obj.$store.commit('SYSTEM_SET_USER', ['更新用户信息成功', res.data])
   }).catch((err) => {
     console.log(err)
+    obj.$store.commit('SYSTEM_SET_USER', ['更新用户信息失败', { username: '', login: false }])
   })
 }
-
+// ------------机构管理
 // 获取机构信息多条
 export function sGetOrg(obj, data) {
   const userOrg = data[2].org
@@ -157,6 +160,7 @@ export function sCreateOrg(obj, data) {
         if (res.data.success) {
           obj.$store.commit('SYSTEM_NEW_ORG', [res.data, '机构创建成功', true])
           obj.$store.commit('SYSTEM_SET_TOOLBAR', 'getOrgs')
+          obj.$store.commit('SET_NOTICE', '机构创建成功')
         } else {
           obj.$store.commit('SYSTEM_NEW_ORG', [res.data, '机构创建失败,机构编码重复', false])
         }
@@ -177,7 +181,56 @@ export function sCreateOrg(obj, data) {
     obj.$store.commit('SYSTEM_NEW_ORG', [org, info, false])
   }
 }
-
+// 获取科室列表([url,port,user])
+export function sGetDepart(obj, data) {
+  const userOrg = data[2].org
+  const userType = data[2].type
+  let url = ''
+  // 根据用户权限判断取值
+  if (userType === 1) {
+    url = `http://${data[0]}:${data[1]}/servers/customize_department`
+  } else {
+    url = `http://${data[0]}:${data[1]}/servers/customize_department?name=${userOrg}`
+  }
+  axios.get(url)
+    .then((res) => {
+      if (res.status === 200) {
+        obj.$store.commit('SYSTEM_GET_DEPAETMENTS', res.data)
+      } else {
+        obj.$store.commit('SYSTEM_GET_DEPAETMENTS', [])
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+      obj.$store.commit('SYSTEM_GET_DEPAETMENTS', [])
+    });
+}
+// 新建科室([url,port,user,obj])
+export function sCreateDepart(obj, data) {
+  const user = data[2]
+  const department = data[3]
+  axios({
+    method: 'post',
+    url: `http://${data[0]}:${data[1]}/servers/customize_department/`,
+    data: qs.stringify({ customize_department: { wt_code: department.code, wt_name: department.name, c_user: user.username, class: department.class, department: department.department, cherf_department: department.cherf_department, professor: department.professor, is_spe: department.is_spe, is_imp: department.is_imp, is_ban: false, org: user.org } }),
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+    responseType: 'json'
+  }).then((res) => {
+    if (res.status === 201) {
+      if (res.data.success) {
+        obj.$store.commit('SYSTEM_NEW_DEPAERT', [res.data, '机构创建成功', true])
+        obj.$store.commit('SYSTEM_SET_TOOLBAR', 'getDepartments')
+      } else {
+        obj.$store.commit('SYSTEM_NEW_DEPAERT', [res.data, '机构创建失败,机构编码重复', false])
+      }
+    } else {
+      obj.$store.commit('SYSTEM_NEW_DEPAERT', [res.data, '连接失败', false])
+    }
+  }).catch((err) => {
+    console.log(err);
+    obj.$store.commit('SYSTEM_NEW_DEPAERT', [{}, '连接失败', false])
+  })
+}
 // 2.2.1 获取分析记录
 export function sGetStat(obj, data) {
   axios.get(`http://${data[0]}:${data[1]}/servers/api/stat_json/`)
@@ -298,35 +351,7 @@ export function sUpdateOrg(obj, data) {
     console.log(err)
   })
 }
-// 2.4.4 获取科室列表
-export function sGetDepart(obj, data) {
-  axios.get(`http://${data[0]}:${data[1]}/servers/customize_department`)
-    .then((res) => {
-      if (res.status === 200) {
-        obj.$store.commit('SYSTEM_SET_SERVER_STATUS', [data[2], '连接成功'])
-      } else {
-        obj.$store.commit('SYSTEM_SET_SERVER_STATUS', [data[2], '连接失败'])
-      }
-      console.log(res);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-}
-// 2.4.5 新建科室
-export function sCreateDepart(obj, data) {
-  axios({
-    method: 'post',
-    url: `http://${data[0]}:${data[1]}/servers/customize_department/`,
-    data: qs.stringify({ customize_department: { wt_code: 'test03', wt_name: '医院2', c_user: 'hitb', class: '03-内科', department: '0303-神经内科专业', cherf_department: 'a', professor: 'b', is_spe: true, is_imp: true, is_ban: true, org: 'test1' } }),
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-    responseType: 'json'
-  }).then((res) => {
-    console.log(res)
-  }).catch((err) => {
-    console.log(err)
-  })
-}
+
 // 2.4.6 更新科室信息
 export function sUpdateDepart(obj, data) {
   axios({
