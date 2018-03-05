@@ -23,7 +23,10 @@ const state = {
   user: { username: '', org: '', type: 2, login: false },
   // 机构信息
   orgs: [],
-  org: []
+  org: [],
+  // 科室信息
+  departments: [],
+  department: []
 };
 
 const mutations = {
@@ -90,6 +93,12 @@ const mutations = {
   SYSTEM_NEW_ORG(state, field) {
     console.log(field)
     state.org = field
+  },
+  SYSTEM_GET_DEPAETMENTS(state, field) {
+    state.departments = field
+  },
+  SYSTEM_NEW_DEPAERT(state, field) {
+    state.department = field
   }
 };
 
@@ -109,6 +118,8 @@ const actions = {
     commit('SYSTEM_INFO_USER');
     commit('SYSTEM_GET_ORGS');
     commit('SYSTEM_NEW_ORG');
+    commit('SYSTEM_GET_DEPAETMENTS');
+    commit('SYSTEM_NEW_DEPAERT');
   },
 };
 
