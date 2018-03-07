@@ -6,10 +6,10 @@
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
-        <li class="nav-item active" v-on:click='getLocalData' id="server-localcase-data">
+        <li class="nav-item active" v-on:click='getLocalData' id="server-drg-localcase-data">
           <a class="nav-link text-light" href="#"> 本地病案数据 <span class="sr-only">(current)</span></a>
         </li>
-        <li class="nav-item active" v-on:click='getServerData' id="server-sercase-data">
+        <li class="nav-item active" v-on:click='getServerData' id="server-drg-sercase-data">
           <a class="nav-link text-light" href="#"> 服务器病案数据 <span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item active" v-on:click='compareData' id="server-drg-checkdata">
@@ -18,7 +18,7 @@
         <li class="nav-item active" v-on:click='drgCompute' id="server-drg-comp">
           <a class="nav-link text-light" href="#"> 调用Drg分组服务 <span class="sr-only">(current)</span></a>
         </li>
-        <li class="nav-item active" v-on:click='drgResult' id="server-drg-result">
+        <li class="nav-item active" v-on:click='drgResult' id="server-drg-stop">
           <a class="nav-link text-light" href="#"> 停止Drg分组服务 <span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item active" v-on:click='drgRule' id="server-drg-rule">
@@ -26,13 +26,14 @@
         </li>
       </ul>
       <form class="form-inline my-2 my-lg-0">
-        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" id="server-drg-search">
       </form>
     </div>
   </nav>
 </template>
 
 <script>
+  import { sGetWt4 } from '../../utils/Server'
   export default {
     data() {
       return {
@@ -42,6 +43,7 @@
     methods: {
       getLocalData: function () {
         this.$store.commit('SYSTEM_SET_TOOLBAR', 'getLocalData');
+        sGetWt4(this, [this.$store.state.System.server, this.$store.state.System.port, 1])
       },
       getServerData: function () {
         this.$store.commit('SYSTEM_SET_TOOLBAR', 'getServerData');
@@ -68,5 +70,4 @@
     margin: 0;
     padding: 0;
   }
-
 </style>

@@ -14,6 +14,8 @@ const state = {
   filesPage: 0,
   fileType: 'csv',
   hintPage: 0,
+  editBarValue: '',
+  hintType: '',
 };
 
 const mutations = {
@@ -112,6 +114,20 @@ const mutations = {
       state.hintPage -= 1
     }
   },
+  EDIT_CONCAT_BAR_VALUE(state, value) {
+    if (state.editBarValue[state.editBarValue.length - 1] === ' ') {
+      const v = state.editBarValue.split(' ')
+      v.push(value)
+      state.editBarValue = v.join(' ')
+    }
+  },
+  EDIT_SET_BAR_VALUE(state, value) {
+    state.editBarValue = value
+  },
+  EDIT_SET_HINT_TYPE(state, value) {
+    state.hintType = value
+    console.log(state.hintType)
+  },
 };
 
 const actions = {
@@ -140,6 +156,9 @@ const actions = {
     commit('EDIT_SET_FILE_TYPE');
     commit('EDIT_NEW_FILES');
     commit('EDIT_SET_HINT_PAGE');
+    commit('EDIT_SET_BAR_VALUE');
+    commit('EDIT_CONCAT_BAR_VALUE');
+    commit('EDIT_SET_HINT_TYPE');
   },
 };
 

@@ -31,40 +31,40 @@
           <a class="nav-link text-light" href="#"> 保存对比 <span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle text-light" href="#" id="stat-bar-left-chart" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <a class="nav-link dropdown-toggle text-light" href="#" id="stat-left-chart" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             左图选择
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a id="stat-left-bar" class="nav-link" href="#" v-on:click='showChart("chartLeft", "柱状图")'> 柱状图 <span class="sr-only">(current)</span></a>
-            <a id="stat-left-discount" class="nav-link" href="#" v-on:click='showChart("chartLeft", "折线图")'> 折线图 <span class="sr-only">(current)</span></a>
-            <a class="nav-link" href="#" v-on:click='showChart("chartLeft", "雷达图")'> 雷达图 <span class="sr-only">(current)</span></a>
-            <a class="nav-link" href="#" v-on:click='showChart("chartLeft", "散点图")'> 散点图 <span class="sr-only">(current)</span></a>
+            <a id="stat-left-chart-bar" class="nav-link" href="#" v-on:click='showChart("chartLeft", "柱状图")'> 柱状图 <span class="sr-only">(current)</span></a>
+            <a id="stat-left-chart-discount" class="nav-link" href="#" v-on:click='showChart("chartLeft", "折线图")'> 折线图 <span class="sr-only">(current)</span></a>
+            <a id="stat-left-chart-radar-map" class="nav-link" href="#" v-on:click='showChart("chartLeft", "雷达图")'> 雷达图 <span class="sr-only">(current)</span></a>
+            <a id="stat-left-chart-scatter-plot" class="nav-link" href="#" v-on:click='showChart("chartLeft", "散点图")'> 散点图 <span class="sr-only">(current)</span></a>
           </div>
         </li>
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle text-light" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <a class="nav-link dropdown-toggle text-light" href="#" id="stat-right-chart" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             右图选择
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="nav-link" href="#" v-on:click='showChart("chartRight", "柱状图")'> 柱状图 <span class="sr-only">(current)</span></a>
-            <a class="nav-link" href="#" v-on:click='showChart("chartRight", "折线图")'> 折线图 <span class="sr-only">(current)</span></a>
-            <a class="nav-link" href="#" v-on:click='showChart("chartRight", "雷达图")'> 雷达图 <span class="sr-only">(current)</span></a>
-            <a class="nav-link" href="#" v-on:click='showChart("chartRight", "散点图")'> 散点图 <span class="sr-only">(current)</span></a>
+            <a id="stat-right-chart-bar" class="nav-link" href="#" v-on:click='showChart("chartRight", "柱状图")'> 柱状图 <span class="sr-only">(current)</span></a>
+            <a id="stat-right-chart-discount" class="nav-link" href="#" v-on:click='showChart("chartRight", "折线图")'> 折线图 <span class="sr-only">(current)</span></a>
+            <a id="stat-right-chart-radar-map" class="nav-link" href="#" v-on:click='showChart("chartRight", "雷达图")'> 雷达图 <span class="sr-only">(current)</span></a>
+            <a id="stat-right-chart-scatter-plot" class="nav-link" href="#" v-on:click='showChart("chartRight", "散点图")'> 散点图 <span class="sr-only">(current)</span></a>
           </div>
         </li>
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle text-light" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <a class="nav-link dropdown-toggle text-light" href="#" id="stat-right-dimension" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             维度选择
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="nav-link" href="#" v-on:click='selX("机构")'> 机构 <span class="sr-only">(current)</span></a>
-            <a class="nav-link" href="#" v-on:click='selX("时间")'> 时间 <span class="sr-only">(current)</span></a>
-            <a class="nav-link" href="#" v-on:click='selX("病种")'> 病种 <span class="sr-only">(current)</span></a>
+            <a id="stat-right-dimension-org" class="nav-link" href="#" v-on:click='selX("机构")'> 机构 <span class="sr-only">(current)</span></a>
+            <a id="stat-right-dimension-time" class="nav-link" href="#" v-on:click='selX("时间")'> 时间 <span class="sr-only">(current)</span></a>
+            <a id="stat-right-dimension-disease" class="nav-link" href="#" v-on:click='selX("病种")'> 病种 <span class="sr-only">(current)</span></a>
           </div>
         </li>
       </ul>
       <form class="form-inline my-2 my-lg-0">
-        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+        <input id="stat-right-search" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
       </form>
     </div>
   </nav>
@@ -76,7 +76,8 @@
   import chartRadar from '../../utils/ChartRadar';
   import chartBar from '../../utils/ChartBar';
   import addContrast from '../../utils/StatContrast';
-  
+  import chartData from '../../utils/ChartData';
+
   export default {
     data() {
       return {
@@ -87,9 +88,13 @@
       loadData: function () {
         this.$store.commit('STAT_SET_LEFT_PANEL', ['file', null]);
         this.$store.commit('STAT_LOAD_FILES');
+        this.$store.commit('STAT_SET_TABLE_TYPE', 'local');
+        this.$store.commit('SET_NOTICE', '读取本地文件');
       },
       serverData: function () {
         this.$store.commit('STAT_SERVER_FILES');
+        this.$store.commit('STAT_SET_TABLE_TYPE', 'local');
+        this.$store.commit('SET_NOTICE', '读取远程文件');
       },
       page: function (n) {
         this.$store.commit('STAT_TABLE_PAGE', n);
@@ -103,17 +108,20 @@
         this.$store.commit('STAT_SET_LEFT_PANEL', ['dimension', x]);
       },
       showChart: function (id, type) {
+        const table = this.$store.state.Stat.file
+        const option = chartData(table, this.$store.state.Stat.selectedRow, this.$store.state.Stat.selectedCol)
+        console.log(option);
         if (id === 'chartRight') {
           // this.$store.commit('SET_CHART_RIGHT', type);
           switch (type) {
             case '柱状图':
-              chartBar(id, this.$store.state.Stat.rightBar)
+              chartBar(id, option)
               break;
             case '折线图':
-              chartLine(id)
+              chartLine(id, option)
               break;
             case '雷达图':
-              chartRadar(id)
+              chartRadar(id, option)
               break;
             case '散点图':
               chartScatter(id)
@@ -124,13 +132,13 @@
           // this.$store.commit('SET_CHART_LEFT', type);
           switch (type) {
             case '柱状图':
-              chartBar(id, this.$store.state.Stat.leftBar)
+              chartBar(id, option)
               break;
             case '折线图':
-              chartLine(id)
+              chartLine(id, option)
               break;
             case '雷达图':
-              chartRadar(id)
+              chartRadar(id, option)
               break;
             case '散点图':
               chartScatter(id)
@@ -147,6 +155,7 @@
         addContrast(this, table, header, col, row)
       },
       showCompare: function () {
+        this.$store.commit('STAT_SET_TABLE_TYPE', 'compare');
       },
     },
   };

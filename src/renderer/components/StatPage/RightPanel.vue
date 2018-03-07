@@ -12,7 +12,7 @@
         <div id="chartRight" style="width: 600px; height:400px;"></div>
       </div>
       <div class="col">
-        <div class="alert alert-danger" role="alert" style="height:100%; overflow-y:auto;">
+        <div class="alert alert-danger" id="stat-right-prompt" role="alert" style="height:100%; overflow-y:auto;">
           <h4 class="alert-heading">数据分析提示</h4>
           <ol class="">
             <li v-for="(data, index) in notice" v-bind:key='index'>{{data}}</li>
@@ -21,8 +21,8 @@
       </div>
     </div>
     <table id="stat-right-table">
-      <tr v-for="(data, index) in xs" v-bind:key='index' v-on:click="onClick(data, index)" v-bind:class="{'table-danger':flag.find((n)=>n===index)}">
-        <td v-for="(field, index) in data" v-bind:key='index' v-bind:class="{'table-danger':flagTd.find((n)=>n===index)}" v-on:click="onClickTd(data, index)">{{data[index]}}</td>
+      <tr v-for="(data, index) in xs" v-bind:key='index' v-on:click="onClick(data, index)" id="stat-right-table-tr" v-bind:class="{'table-danger':flag.find((n)=>n===index)}">
+        <td v-for="(field, index) in data" v-bind:key='index' v-bind:class="{'table-danger':flagTd.find((n)=>n===index)}" v-on:click="onClickTd(data, index)" id="stat-right-table-td">{{data[index]}}</td>
       </tr>
     </table>
   </div>
@@ -52,24 +52,31 @@
       },
       xs: {
         get() {
-          const f = []
-          let start = 0
-          let fileLen = this.$store.state.Stat.tableSel.length;
-          // console.log(fileLen)
-          if (fileLen > 99) {
-            if (this.$store.state.Stat.tablePage > 0) {
-              start = 100 * this.$store.state.Stat.tablePage
-              fileLen = start + 99
-            } else {
-              fileLen = 99
+          let table = []
+          if (this.$store.state.Stat.tableType === 'local') {
+            const f = []
+            let start = 0
+            let fileLen = this.$store.state.Stat.tableSel.length;
+            // console.log(fileLen)
+            if (fileLen > 99) {
+              if (this.$store.state.Stat.tablePage > 0) {
+                start = 100 * this.$store.state.Stat.tablePage
+                fileLen = start + 99
+              } else {
+                fileLen = 99
+              }
             }
+            for (let i = start; i < fileLen; i += 1) {
+              f.push(this.$store.state.Stat.tableSel[i])
+            }
+            const a = this.$store.state.Stat.tableHeader[0]
+            f.splice(0, 0, a)
+            // return f
+            table = f
+          } else {
+            table = this.$store.state.Stat.compareTable
           }
-          for (let i = start; i < fileLen; i += 1) {
-            f.push(this.$store.state.Stat.tableSel[i])
-          }
-          const a = this.$store.state.Stat.tableHeader[0]
-          f.splice(0, 0, a)
-          return f
+          return table
         }
       }
     },
@@ -98,15 +105,14 @@
         const id = 'chartLeft'
         const type = '柱状图'
         const table = this.$store.state.Stat.file
-        const option = chartData(table)
-        // console.log(option)
+        const option = chartData(table, this.flag, this.flagTd)
         switch (type) {
           case '柱状图':
             chartBar(id, option)
             this.$store.commit('STAT_SET_CHART_OPTION', [id, type, option])
             break;
           case '折线图':
-            chartLine(id)
+            chartLine(id, option)
             break;
           case '雷达图':
             chartRadar(id)

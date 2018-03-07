@@ -181,6 +181,31 @@ export function sCreateOrg(obj, data) {
     obj.$store.commit('SYSTEM_NEW_ORG', [org, info, false])
   }
 }
+// 更新机构信息
+export function sUpdateOrg(obj, data) {
+  axios({
+    method: 'put',
+    url: `http://${data[0]}:${data[1]}/servers/org/${data[2]}`,
+    data: qs.stringify({ org: data[3] }),
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+    responseType: 'json'
+  }).then((res) => {
+    if (res.status === 201) {
+      if (res.data.success) {
+        obj.$store.commit('SYSTEM_NEW_ORG', [res.data, '机构更新成功', true])
+        obj.$store.commit('SYSTEM_SET_TOOLBAR', 'getOrgs')
+        obj.$store.commit('SET_NOTICE', '机构更新成功')
+      } else {
+        obj.$store.commit('SYSTEM_NEW_ORG', [res.data, '机构更新失败', false])
+      }
+    } else {
+      obj.$store.commit('SYSTEM_NEW_ORG', [res.data, '连接失败', false])
+    }
+  }).catch((err) => {
+    console.log(err);
+    obj.$store.commit('SYSTEM_NEW_ORG', [{}, '连接失败', false])
+  })
+}
 // 获取科室列表([url,port,user])
 export function sGetDepart(obj, data) {
   const userOrg = data[2].org
@@ -230,6 +255,76 @@ export function sCreateDepart(obj, data) {
     console.log(err);
     obj.$store.commit('SYSTEM_NEW_DEPAERT', [{}, '连接失败', false])
   })
+}
+// 更新科室信息
+export function sUpdateDepart(obj, data) {
+  axios({
+    method: 'put',
+    url: `http://${data[0]}:${data[1]}/servers/customize_department/${data[2]}`,
+    data: qs.stringify({ customize_department: data[3] }),
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+    responseType: 'json'
+  }).then((res) => {
+    if (res.status === 201) {
+      if (res.data.success) {
+        obj.$store.commit('SYSTEM_NEW_DEPAERT', [res.data, '机构更新成功', true])
+        obj.$store.commit('SYSTEM_SET_TOOLBAR', 'getDepart')
+      } else {
+        obj.$store.commit('SYSTEM_NEW_DEPAERT', [res.data, '机构更新失败,机构编码重复', false])
+      }
+    } else {
+      obj.$store.commit('SYSTEM_NEW_DEPAERT', [res.data, '连接失败', false])
+    }
+  }).catch((err) => {
+    console.log(err);
+    obj.$store.commit('SYSTEM_NEW_DEPAERT', [{}, '连接失败', false])
+  })
+}
+// ------------病案
+// 病案查询
+export function sGetWt4(obj, data) {
+  axios({
+    method: 'get',
+    url: `http://${data[0]}:${data[1]}/library/wt4?page=${data[2]}`,
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+    responseType: 'json'
+  }).then((res) => {
+    if (res.status === 200) {
+      obj.$store.commit('SYSTEM_SET_WT4', [res.data, '病案查询成功', true])
+    } else {
+      obj.$store.commit('SYSTEM_SET_WT4', [{}, '病案查询失败', false])
+    }
+  }).catch((err) => {
+    console.log(err);
+    obj.$store.commit('SYSTEM_SET_WT4', [{}, '连接失败', false])
+  })
+}
+// 单条分组
+export function sCompDrg(obj, data) {
+  const dataWt4 = data[2]
+  if (dataWt4) {
+    const diagsCode = dataWt4.opers_code.join('","')
+    const opersCode = dataWt4.opers_code.join('","')
+    const wt4 = { ACCTUAL_DAYS: dataWt4.acctual_days, B_WT4_V1_ID: dataWt4.b_wt4_v1_id, DISEASE_CODE: dataWt4.disease_code, AGE: dataWt4.age, GENDER: dataWt4.gender, SF0100: dataWt4.sf0100, SF0102: dataWt4.sf0102, SF0104: dataWt4.sf0104, SF0108: dataWt4.sf0108, TOTAL_EXPENSE: dataWt4.total_expense, diags_code: `["${diagsCode}"]`, opers_code: `["${opersCode}"]` }
+    axios({
+      method: 'post',
+      url: `http://${data[0]}:${data[1]}/drgserver/comp_drg/`,
+      data: qs.stringify(wt4),
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+      responseType: 'json'
+    }).then((res) => {
+      if (res.status === 200) {
+        obj.$store.commit('SYSTEM_GET_WT4_COMP', [res.data.result, '病案分组成功', true])
+      } else {
+        obj.$store.commit('SYSTEM_GET_WT4_COMP', [{}, '病案分组失败', true])
+      }
+    }).catch((err) => {
+      console.log(err)
+      obj.$store.commit('SYSTEM_GET_WT4_COMP', [{}, '连接失败', true])
+    })
+  } else {
+    obj.$store.commit('SYSTEM_GET_WT4_COMP', [{}, '病案分组失败,病案不存在', true])
+  }
 }
 // 2.2.1 获取分析记录
 export function sGetStat(obj, data) {
@@ -335,37 +430,6 @@ export function sSearchRule(obj, data) {
       console.log(err);
     });
 }
-
-
-// 2.4.3 更新机构信息
-export function sUpdateOrg(obj, data) {
-  axios({
-    method: 'put',
-    url: `http://${data[0]}:${data[1]}/servers/org/3`,
-    data: qs.stringify({ org: { name: '医院3' } }),
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-    responseType: 'json'
-  }).then((res) => {
-    console.log(res)
-  }).catch((err) => {
-    console.log(err)
-  })
-}
-
-// 2.4.6 更新科室信息
-export function sUpdateDepart(obj, data) {
-  axios({
-    method: 'put',
-    url: `http://${data[0]}:${data[1]}/servers/customize_department/45`,
-    data: qs.stringify({ customize_department: { wt_name: 'test04' } }),
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-    responseType: 'json'
-  }).then((res) => {
-    console.log(res)
-  }).catch((err) => {
-    console.log(err)
-  })
-}
 // 2.4.7 获取标准科室列表
 export function sGetSystemDepart(obj, data) {
   axios.get(`http://${data[0]}:${data[1]}/servers/department`)
@@ -430,20 +494,6 @@ export function sStatDoc(obj, data) {
     method: 'post',
     url: `http://${data[0]}:${data[1]}/hospitals/api/stat/`,
     data: qs.stringify({ username: 'hitb', password: 'test123456' }),
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-    responseType: 'json'
-  }).then((res) => {
-    console.log(res)
-  }).catch((err) => {
-    console.log(err)
-  })
-}
-// 2.6.2 调用单条分组（跳转到分组服务器）
-export function sCompDrg(obj, data) {
-  axios({
-    method: 'post',
-    url: `http://${data[0]}:${data[1]}/hospitals/api/comp_drg/`,
-    data: qs.stringify({ B_WT4_V1_ID: 70235613, DISEASE_CODE: 'H25.901', AGE: 20, GENDER: '男', SF0100: -1, SF0102: -1, SF0104: -1, SF0108: -1, ACCTUAL_DAYS: 13, TOTAL_EXPENSE: 348128.74, diags_code: [], opers_code: ['00.31001', '02.93002', '86.98001', '87.03001'] }),
     headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
     responseType: 'json'
   }).then((res) => {

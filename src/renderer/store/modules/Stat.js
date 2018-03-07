@@ -28,6 +28,7 @@ const state = {
   selectedRow: [],
   selectedCol: [],
   compareTable: [],
+  tableType: 'local',
 };
 
 const mutations = {
@@ -167,6 +168,9 @@ const mutations = {
   STAT_SET_COMPARE_TABLE(state, data) {
     state.compareTable = data
   },
+  STAT_SET_TABLE_TYPE(state, data) {
+    state.tableType = data
+  },
 };
 
 const actions = {
@@ -183,6 +187,7 @@ const actions = {
     commit('STAT_SET_COL');
     commit('STAT_SET_ROW');
     commit('STAT_SET_COMPARE_TABLE');
+    commit('STAT_SET_TABLE_TYPE');
   },
 };
 
