@@ -28,7 +28,9 @@ const state = {
   selectedRow: [],
   selectedCol: [],
   compareTable: [],
-  tableType: 'local',
+  chartLeft: '柱状图',
+  chartRight: '柱状图',
+  tableType: 'local'
 };
 
 const mutations = {
@@ -171,6 +173,12 @@ const mutations = {
   STAT_SET_TABLE_TYPE(state, data) {
     state.tableType = data
   },
+  SET_CHART_LEFT(state, data) {
+    state.chartLeft = data
+  },
+  SET_CHART_RIGHT(state, data) {
+    state.chartRight = data
+  }
 };
 
 const actions = {
@@ -187,6 +195,8 @@ const actions = {
     commit('STAT_SET_COL');
     commit('STAT_SET_ROW');
     commit('STAT_SET_COMPARE_TABLE');
+    commit('SET_CHART_LEFT');
+    commit('SET_CHART_RIGHT');
     commit('STAT_SET_TABLE_TYPE');
   },
 };

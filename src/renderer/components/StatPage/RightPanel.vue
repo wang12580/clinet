@@ -21,7 +21,7 @@
       </div>
     </div>
     <table id="stat-right-table">
-      <tr v-for="(data, index) in xs" v-bind:key='index' v-on:click="onClick(data, index)" id="stat-right-table-tr" v-bind:class="{'table-danger':flag.find((n)=>n===index)}">
+      <tr v-for="(data, index) in xs" v-bind:key='index' v-on:click="onClick(data, index)" class="stat-right-table-tr" v-bind:class="{'table-danger':flag.find((n)=>n===index)}">
         <td v-for="(field, index) in data" v-bind:key='index' v-bind:class="{'table-danger':flagTd.find((n)=>n===index)}" v-on:click="onClickTd(data, index)" id="stat-right-table-td">{{data[index]}}</td>
       </tr>
     </table>
@@ -71,7 +71,6 @@
             }
             const a = this.$store.state.Stat.tableHeader[0]
             f.splice(0, 0, a)
-            // return f
             table = f
           } else {
             table = this.$store.state.Stat.compareTable
@@ -103,7 +102,8 @@
         this.$store.commit('STAT_GET_FIELD', data);
         this.$store.commit('STAT_GET_FIELD_INDEX', index);
         const id = 'chartLeft'
-        const type = '柱状图'
+        const type = this.$store.state.Stat.chartLeft
+
         const table = this.$store.state.Stat.file
         const option = chartData(table, this.flag, this.flagTd)
         switch (type) {
@@ -115,10 +115,28 @@
             chartLine(id, option)
             break;
           case '雷达图':
-            chartRadar(id)
+            chartRadar(id, option)
             break;
           case '散点图':
             chartScatter(id)
+            break;
+          default: break;
+        }
+        const idRight = 'chartRight'
+        const typeRight = this.$store.state.Stat.chartRight
+        const optionRight = chartData(table, this.flag, this.flagTd)
+        switch (typeRight) {
+          case '柱状图':
+            chartBar(idRight, optionRight)
+            break;
+          case '折线图':
+            chartLine(idRight, optionRight)
+            break;
+          case '雷达图':
+            chartRadar(idRight, optionRight)
+            break;
+          case '散点图':
+            chartScatter(idRight)
             break;
           default: break;
         }

@@ -27,7 +27,7 @@
         <li class="nav-item active" id="stat-show-contrast" v-on:click='showCompare'>
           <a class="nav-link text-light" href="#"> 显示对比 <span class="sr-only">(current)</span></a>
         </li>
-        <li class="nav-item active" id="stat-save-contrast" v-on:click='showCompare'>
+        <li class="nav-item active" id="stat-save-contrast" v-on:click='saveCompare'>
           <a class="nav-link text-light" href="#"> 保存对比 <span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item dropdown">
@@ -77,6 +77,7 @@
   import chartBar from '../../utils/ChartBar';
   import addContrast from '../../utils/StatContrast';
   import chartData from '../../utils/ChartData';
+  import saveFile from '../../utils/SaveFile';
 
   export default {
     data() {
@@ -88,13 +89,9 @@
       loadData: function () {
         this.$store.commit('STAT_SET_LEFT_PANEL', ['file', null]);
         this.$store.commit('STAT_LOAD_FILES');
-        this.$store.commit('STAT_SET_TABLE_TYPE', 'local');
-        this.$store.commit('SET_NOTICE', '读取本地文件');
       },
       serverData: function () {
         this.$store.commit('STAT_SERVER_FILES');
-        this.$store.commit('STAT_SET_TABLE_TYPE', 'local');
-        this.$store.commit('SET_NOTICE', '读取远程文件');
       },
       page: function (n) {
         this.$store.commit('STAT_TABLE_PAGE', n);
@@ -112,7 +109,7 @@
         const option = chartData(table, this.$store.state.Stat.selectedRow, this.$store.state.Stat.selectedCol)
         console.log(option);
         if (id === 'chartRight') {
-          // this.$store.commit('SET_CHART_RIGHT', type);
+          this.$store.commit('SET_CHART_RIGHT', type);
           switch (type) {
             case '柱状图':
               chartBar(id, option)
@@ -121,7 +118,7 @@
               chartLine(id, option)
               break;
             case '雷达图':
-              chartRadar(id, option)
+              chartRadar(id)
               break;
             case '散点图':
               chartScatter(id)
@@ -129,7 +126,7 @@
             default: break;
           }
         } else {
-          // this.$store.commit('SET_CHART_LEFT', type);
+          this.$store.commit('SET_CHART_LEFT', type);
           switch (type) {
             case '柱状图':
               chartBar(id, option)
@@ -138,7 +135,7 @@
               chartLine(id, option)
               break;
             case '雷达图':
-              chartRadar(id, option)
+              chartRadar(id)
               break;
             case '散点图':
               chartScatter(id)
@@ -156,6 +153,12 @@
       },
       showCompare: function () {
         this.$store.commit('STAT_SET_TABLE_TYPE', 'compare');
+      },
+      saveCompare: function () {
+        const d = new Date();
+        const datetime = `${d.getFullYear()}${d.getMonth() + 1}${d.getDate()}${d.getHours()}${d.getMinutes()}${d.getSeconds()}`
+        this.$store.commit('STAT_LOAD_FILE', this.$store.state.Stat.compareTable);
+        saveFile(this, `${datetime}stat.csv`, 'stat')
       },
     },
   };
