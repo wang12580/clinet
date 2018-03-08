@@ -36,7 +36,7 @@ const state = {
 
 const mutations = {
   STAT_LOAD_FILES() {
-    const files = fs.readdirSync(global.hitbdata.path.stat).filter(x => x.endsWith('.csv')).filter(x => x.indexOf("stat") >= 0)
+    const files = fs.readdirSync(global.hitbdata.path.stat).filter(x => x.endsWith('.csv'))
     state.files = files;
   },
   STAT_LOAD_FILE(state, message) {
@@ -50,7 +50,7 @@ const mutations = {
     state.dimensionDrg = [...new Set(state.table.map(a => a[2]))]
     state.notice = [
       `病案总数：${state.tableSel.length - 1}`,
-      `机构总数：${state.dimensionOrg.length - 1}`,
+      `机构总数：${state.dimensionOrg.length}`,
       `时间维度总数：${state.dimensionTime.length - 1}`,
       `病种维度总数：${state.dimensionDrg.length - 1}`,
     ]
