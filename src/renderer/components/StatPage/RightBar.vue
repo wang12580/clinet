@@ -99,6 +99,7 @@
       edit: function () {
         this.$store.commit('EDIT_SET_LAST_NAV', '/stat');
         this.$store.commit('EDIT_SET_RIGHT_PANEL', 'local');
+        this.$store.commit('EDIT_SET_FILES_INDEX', this.$store.state.Stat.fileIndex);
         this.$router.push('/edit');
       },
       selX: function (x) {
@@ -109,7 +110,7 @@
         const option = chartData(table, this.$store.state.Stat.selectedRow, this.$store.state.Stat.selectedCol)
         console.log(option);
         if (id === 'chartRight') {
-          this.$store.commit('SET_CHART_RIGHT', type);
+          this.$store.commit('STAT_SET_CHART_RIGHT', type);
           switch (type) {
             case '柱状图':
               chartBar(id, option)
@@ -126,7 +127,7 @@
             default: break;
           }
         } else {
-          this.$store.commit('SET_CHART_LEFT', type);
+          this.$store.commit('STAT_SET_CHART_LEFT', type);
           switch (type) {
             case '柱状图':
               chartBar(id, option)
