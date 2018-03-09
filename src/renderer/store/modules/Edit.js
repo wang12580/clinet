@@ -15,7 +15,7 @@ const state = {
   fileType: 'csv',
   hintPage: 0,
   editBarValue: '',
-  hintType: '',
+  hintType: 'notice',
   hint: [],
 };
 
@@ -116,9 +116,12 @@ const mutations = {
     }
   },
   EDIT_CONCAT_BAR_VALUE(state, value) {
+    const v = state.editBarValue.split(' ')
     if (state.editBarValue[state.editBarValue.length - 1] === ' ') {
-      const v = state.editBarValue.split(' ')
       v.push(value)
+      state.editBarValue = v.join(' ')
+    } else {
+      v.splice(v.length - 1, 1, value)
       state.editBarValue = v.join(' ')
     }
   },

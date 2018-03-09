@@ -34,7 +34,7 @@
           <a class="nav-link dropdown-toggle text-light" href="#" id="stat-left-chart" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             左图选择
           </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <div class="dropdown-menu" aria-labelledby="stat-left-chart">
             <a id="stat-left-chart-bar" class="nav-link" href="#" v-on:click='showChart("chartLeft", "柱状图")'> 柱状图 <span class="sr-only">(current)</span></a>
             <a id="stat-left-chart-discount" class="nav-link" href="#" v-on:click='showChart("chartLeft", "折线图")'> 折线图 <span class="sr-only">(current)</span></a>
             <a id="stat-left-chart-radar-map" class="nav-link" href="#" v-on:click='showChart("chartLeft", "雷达图")'> 雷达图 <span class="sr-only">(current)</span></a>
@@ -45,7 +45,7 @@
           <a class="nav-link dropdown-toggle text-light" href="#" id="stat-right-chart" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             右图选择
           </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <div class="dropdown-menu" aria-labelledby="stat-right-chart">
             <a id="stat-right-chart-bar" class="nav-link" href="#" v-on:click='showChart("chartRight", "柱状图")'> 柱状图 <span class="sr-only">(current)</span></a>
             <a id="stat-right-chart-discount" class="nav-link" href="#" v-on:click='showChart("chartRight", "折线图")'> 折线图 <span class="sr-only">(current)</span></a>
             <a id="stat-right-chart-radar-map" class="nav-link" href="#" v-on:click='showChart("chartRight", "雷达图")'> 雷达图 <span class="sr-only">(current)</span></a>
@@ -78,6 +78,7 @@
   import addContrast from '../../utils/StatContrast';
   import chartData from '../../utils/ChartData';
   import saveFile from '../../utils/SaveFile';
+  import getStatFiles from '../../utils/StatServerFile';
 
   export default {
     data() {
@@ -91,7 +92,14 @@
         this.$store.commit('STAT_LOAD_FILES');
       },
       serverData: function () {
-        this.$store.commit('STAT_SERVER_FILES');
+        if (this.$store.state.System.server === '') {
+          const key = Object.keys(global.hitbdata.server)
+          const server = global.hitbdata.server[key];
+          console.log(server);
+          getStatFiles(this, ['www.jiankanglaifu.com', '80'])
+        } else {
+          getStatFiles(this, [this.$store.state.System.server, this.$store.state.System.port])
+        }
       },
       page: function (n) {
         this.$store.commit('STAT_TABLE_PAGE', n);
@@ -106,9 +114,15 @@
         this.$store.commit('STAT_SET_LEFT_PANEL', ['dimension', x]);
       },
       showChart: function (id, type) {
-        const table = this.$store.state.Stat.file
-        const option = chartData(table, this.$store.state.Stat.selectedRow, this.$store.state.Stat.selectedCol)
-        console.log(option);
+        let table = []
+        if (this.$store.state.Stat.tableType === 'local') {
+          table = this.$store.state.Stat.file
+        } else if (this.$store.state.Stat.tableType === 'server') {
+          table = this.$store.state.Stat.serverTable
+        } else {
+          table = this.$store.state.Stat.compareTable
+        }
+        const option = chartData(table, this.$store.state.Stat.selectedRow, this.$store.state.Stat.selectedCol, this.$store.state.Stat.tableType)
         if (id === 'chartRight') {
           this.$store.commit('STAT_SET_CHART_RIGHT', type);
           switch (type) {
