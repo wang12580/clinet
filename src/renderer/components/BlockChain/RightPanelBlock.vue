@@ -35,7 +35,7 @@
     </div>
     <div v-if="toolbar == 'blockInfo'">
       <table  class="table">
-        <tr v-for="(value, key) in blockInfo">
+        <tr v-for="(value, key) in blockInfo" v-bind:key="key">
           <td>{{key}}</td>
           <td>{{value}}</td>
         </tr>

@@ -37,7 +37,10 @@ const state = {
   wt4Row: [],
   wt4Comp: [],
   wt4LocalRow: [],
-  comprule: []
+  comprule: [],
+  localPage: 0,
+  wt4Tables: [],
+  wt4TablePage: 0
 };
 
 const mutations = {
@@ -159,7 +162,19 @@ const mutations = {
       objs.push(obj);
     })
     state.wt4Table = objs
-    console.log(objs)
+    state.wt4TablePage = Math.floor(objs.length / 10)
+  },
+  SYSTEM_SET_LOCAL_PAGE(state, field) {
+    switch (field) {
+      case 'up':
+        state.localPage -= 1
+        break;
+      case 'down':
+        state.localPage += 1
+        break;
+      default:
+    }
+    state.wt4Tables = state.wt4Table.slice(state.localPage * 10, (state.localPage * 10) + 10);
   },
   SYSTEM_GET_WT4_LOCAL_ROW(state, field) {
     if (state.wt4LocalRow.includes(field)) {
@@ -200,7 +215,8 @@ const actions = {
     commit('SYSTEM_LOAD_WT4_FILE');
     commit('SYSTEM_GET_WT4ROW');
     commit('SYSTEM_GET_WT4_COMP');
-    commit('SYSTEM_GET_WT4_LOCAL_ROW')
+    commit('SYSTEM_GET_WT4_LOCAL_ROW');
+    commit('SYSTEM_SET_LOCAL_PAGE');
   },
 };
 
