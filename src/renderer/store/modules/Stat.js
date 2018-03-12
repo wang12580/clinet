@@ -33,7 +33,9 @@ const state = {
   chartRight: '柱状图',
   tableType: 'local',
   fileIndex: null,
-  tableName: ''
+  tableName: '',
+  statFlag: [],
+  statFlarTd: []
 };
 
 const mutations = {
@@ -188,6 +190,28 @@ const mutations = {
   },
   STAT_TABLE_NAME(state, index) {
     state.tableName = index
+  },
+  STAT_SET_FLAG(state, value) {
+    const x = state.statFlag.indexOf(value)
+    if (x === -1) {
+      state.statFlag.push(value)
+    } else {
+      state.statFlag.splice(x, 1)
+    }
+  },
+  STAT_SET_FLAGTD(state, value) {
+    const x = state.statFlarTd.indexOf(value)
+    if (x === -1) {
+      state.statFlarTd.push(value)
+    } else {
+      state.statFlarTd.splice(x, 1)
+    }
+  },
+  STAT_SET_FILE_FLAG(state) {
+    state.statFlag = [];
+  },
+  STAT_SET_FILE_FLAGTD(state) {
+    state.statFlarTd = [];
   }
 };
 
@@ -209,6 +233,10 @@ const actions = {
     commit('STAT_SET_CHART_RIGHT');
     commit('STAT_SET_TABLE_TYPE');
     commit('STAT_SET_FILE_INDEX');
+    commit('STAT_SET_FLAG');
+    commit('STAT_SET_FLAGTD');
+    commit('STAT_SET_FILE_FLAG');
+    commit('STAT_SET_FILE_FLAGTD');
   },
 };
 

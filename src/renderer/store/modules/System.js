@@ -169,7 +169,9 @@ const mutations = {
     }
   },
   SYSTEM_GET_COMPRULE(state, field) {
-    state.comprule = field[0].data;
+    const keys = field[0].data.map((value, index) => [value.code, index])
+    const value = keys.sort().map(value => field[0].data[value[1]])
+    state.comprule = value;
   },
 };
 
