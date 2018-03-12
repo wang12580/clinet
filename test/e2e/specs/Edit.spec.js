@@ -5,11 +5,11 @@ describe('Edit', function () {
   afterEach(utils.afterEach);
 
   it('Edit-测试1', function () {
-    this.timeout(6000)
+    this.timeout(60000)
     // 1、点击login页面的login-button
     return this.app.client.click('#login')
     // 等待底部通知框出现'未注册用户登陆！'提示，进入Home页
-      .waitUntilTextExists('#notice-bar', '未注册用户登陆！')
+      .waitUntilTextExists('#edit-bar-prompt', '未注册用户登陆！')
     // 2、点击顶部导航栏的edit-page，进入edit页
       .click('#navbar-edit')
       .waitUntilTextExists('#edit-editbar-input', '')
@@ -20,15 +20,15 @@ describe('Edit', function () {
       })
     // +++++++++++++直接点击工具栏按钮++++++++++++++++++
     // 2.1、点击左侧工具栏 返回按钮edit-leftbar-back, 页面返回首页
-      .click('#edit-leftbar-back')
-      .waitUntilTextExists('#notice-bar', '数据采集-数据采集')
-      // 点击顶部导航栏的edit-page，进入edit页
-      .click('#navbar-edit')
-      .waitUntilTextExists('#edit-editbar-input', '')
-      .getText('#edit-editbar-input')
-      .then(function (editText) {
-        expect(editText).to.equal('');
-      })
+      // .click('#edit-leftbar-back')
+      // .waitUntilTextExists('#notice-bar', '数据采集-数据采集')
+      // // 点击顶部导航栏的edit-page，进入edit页
+      // .click('#navbar-edit')
+      // .waitUntilTextExists('#edit-editbar-input', '')
+      // .getText('#edit-editbar-input')
+      // .then(function (editText) {
+      //   expect(editText).to.equal('');
+      // })
     // 2.2、点击左侧工具栏 选择下拉按钮 edit-leftbar-choice
     // 该 选择按钮id 更改完 会报错 Error: An element could not be located on the page using the given search parameters
       .click('#edit-leftbar-choice')
@@ -63,7 +63,7 @@ describe('Edit', function () {
     // 2.10、点击右侧工具栏 本地按钮 edit-rightbar-local 右侧出现当前本地文件
       .click('#edit-rightbar-local')
       .waitUntilTextExists('#edit-rightpanellocal-title', '用户本地文件')
-      .getText('.edit-rightpanellocal-tr')
+      // .getText('.edit-rightpanellocal-tr')
       .getText('#edit-rightpanellocal-table')
       .then(function (editText) {
         expect(editText).to.not.equal('');
@@ -75,13 +75,14 @@ describe('Edit', function () {
       })
     // ++++++++++++++++++点击用户本地文件单行+++++++++++++++++++++++++++++
     // 2.10.1 选择本地文件 点击单行,左侧出现该文件中的病历
-      // .click('#edit-rightpanellocal-table')
+      .click('#edit-rightpanellocal-table')
       // .getText('.edit-leftpaneltable-tr')
-      // .getText('#edit-leftpaneltable-table')
-      // // .waitUntilWindowLoaded(1000)
-      // .then(function (editText) {
-      //   expect(editText).to.not.equal('');
-      // })
+      .getText('#edit-leftpaneltable-table')
+      // .waitUntilWindowLoaded(1000)
+      .then(function (editText) {
+        console.log(editText);
+        expect(editText).to.not.equal('');
+      })
     // ++++++++++++++++++点击用户本地文件单行---不点击选择编辑条目单行+++++++++++++++++++++++++++++
     // 2.10.1.1 点击左侧工具栏 保存按钮 对该病历进行保存
     // 2.10.1.2 点击左侧工具栏 另存按钮 对该病历进行另存

@@ -63,7 +63,12 @@
         if (v.length > 0) {
           this.$store.commit('EDIT_UPDATE_DOC', [n, v]);
           this.$store.commit('EDIT_SET_DOC_INDEX', [1]);
-          this.item = '';
+          const x = this.$store.state.Edit.doc[n + 1]
+          if (x) {
+            this.item = x.toString().replace(/,/g, '   ')
+          } else {
+            this.item = ''
+          }
         }
       },
       up() {
@@ -120,7 +125,7 @@
       space() {
         this.$store.commit('EDIT_SET_HINT_TYPE', 'hint');
         const value = this.$store.state.Edit.editBarValue
-        if (value.indexOf(' ') === -1) {
+        if (value && value.indexOf(' ') === -1) {
           this.$store.commit('EDIT_SET_HINT', global.hitbdata.cdh[value]);
         }
       },

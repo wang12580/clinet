@@ -33,12 +33,12 @@ const state = {
   chartRight: '柱状图',
   tableType: 'local',
   fileIndex: null,
+  tableName: ''
 };
 
 const mutations = {
   STAT_LOAD_FILES() {
-    const files = fs.readdirSync(global.hitbdata.path.stat).filter(x => x.endsWith('.csv'))
-    state.files = files;
+    state.files = fs.readdirSync(global.hitbdata.path.stat).filter(x => x.endsWith('.csv'))
   },
   STAT_LOAD_FILE(state, message) {
     state.file = message;
@@ -185,6 +185,9 @@ const mutations = {
   },
   STAT_SET_FILE_INDEX(state, index) {
     state.fileIndex = index
+  },
+  STAT_TABLE_NAME(state, index) {
+    state.tableName = index
   }
 };
 

@@ -22,7 +22,7 @@
     </div>
     <table id="stat-right-table">
       <tr v-for="(data, index) in xs" v-bind:key='index' v-on:click="onClick(data, index)" class="stat-right-table-tr" v-bind:class="{'table-danger':flag.find((n)=>n===index)}">
-        <td v-for="(field, index) in data" v-bind:key='index' v-bind:class="{'table-danger':flagTd.find((n)=>n===index)}" v-on:click="onClickTd(data, index)" id="stat-right-table-td">{{data[index]}}</td>
+        <td v-for="(field, index) in data" v-bind:key='index' v-bind:class="{'table-danger':flagTd.find((n)=>n===index)}" v-on:click="onClickTd(data, index)" id="stat-right-table-td"  v-if="index < 10">{{data[index]}}</td>
       </tr>
     </table>
   </div>
@@ -34,6 +34,7 @@
   import chartScatter from '../../utils/ChartScatter';
   import chartRadar from '../../utils/ChartRadar';
   import chartBar from '../../utils/ChartBar';
+  import chartPie from '../../utils/ChartPie';
   import RightBar from './RightBar';
   import LeftPanel from './LeftPanel';
   export default {
@@ -113,7 +114,7 @@
         } else {
           table = this.$store.state.Stat.compareTable
         }
-        const option = chartData(table, this.flag, this.flagTd, this.$store.state.Stat.tableType)
+        const option = chartData(table, this.flag, this.flagTd)
         switch (type) {
           case '柱状图':
             chartBar(id, option)
@@ -126,13 +127,16 @@
             chartRadar(id, option)
             break;
           case '散点图':
-            chartScatter(id)
+            chartScatter(id, option)
+            break;
+          case '饼图':
+            chartPie(id, option)
             break;
           default: break;
         }
         const idRight = 'chartRight'
         const typeRight = this.$store.state.Stat.chartRight
-        const optionRight = chartData(table, this.flag, this.flagTd, this.$store.state.Stat.tableType)
+        const optionRight = chartData(table, this.flag, this.flagTd)
         switch (typeRight) {
           case '柱状图':
             chartBar(idRight, optionRight)
@@ -144,7 +148,10 @@
             chartRadar(idRight, optionRight)
             break;
           case '散点图':
-            chartScatter(idRight)
+            chartScatter(idRight, optionRight)
+            break;
+          case '饼图':
+            chartPie(idRight, optionRight)
             break;
           default: break;
         }

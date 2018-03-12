@@ -11,23 +11,21 @@
             选择
           </a>
           <div class="dropdown-menu" aria-labelledby="edit-rightbar-choice">
-            <a class="dropdown-item" href="#" v-on:click='help'>输入框提示</a>
+            <a class="dropdown-item" href="#" v-on:click='help("编辑器使用帮助")'>编辑器使用帮助</a>
+            <a class="dropdown-item" href="#" v-on:click='help("输入框提示")'>输入框提示</a>
             <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="#" v-on:click='help'>病案历史</a>
-            <a class="dropdown-item" href="#" v-on:click='help'>病案参考</a>
+            <a class="dropdown-item" href="#" v-on:click='help("病案历史")'>病案历史</a>
+            <a class="dropdown-item" href="#" v-on:click='help("病案参考")'>病案参考</a>
           </div>
         </li>
-        <li class="nav-item active" v-on:click='help' id="edit-rightbar-help">
+        <li class="nav-item active" v-on:click='help(null)' id="edit-rightbar-help">
           <a class="nav-link text-light" href="#"> 帮助 <span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item active" v-on:click='localData' id="edit-rightbar-local">
-          <a class="nav-link text-light" href="#"> 本地 <span class="sr-only">(current)</span></a>
+          <a class="nav-link text-light" href="#"> 本地文件 <span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item active" v-on:click='serverData' id="edit-rightbar-server">
-          <a class="nav-link text-light" href="#"> 远程 <span class="sr-only">(current)</span></a>
-        </li>
-        <li class="nav-item active" v-on:click='newFiles' id="edit-rightbar-files">
-          <a class="nav-link text-light" href="#"> 新文件 <span class="sr-only">(current)</span></a>
+          <a class="nav-link text-light" href="#"> 远程文件 <span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item active">
           <a class="nav-link text-light" href="#" v-on:click='page(-1)' id="edit-rightbar-uppage"> 前页 <span class="sr-only">(current)</span></a>
@@ -44,7 +42,6 @@
 </template>
 
 <script>
-  import saveFile from '../../utils/SaveFile'
   export default {
     data() {
       return {
@@ -52,14 +49,30 @@
       };
     },
     methods: {
-      help: function () {
+      help: function (n) {
         this.$store.commit('EDIT_SET_RIGHT_PANEL', 'help');
+        if (n) {
+          this.$store.commit('EDIT_SET_HELP_TYPE', n);
+          this.$store.commit('SET_NOTICE', n);
+        }
       },
       localData: function () {
-        this.$store.commit('EDIT_SET_LAST_NAV', 'user');
         this.$store.commit('EDIT_SET_RIGHT_PANEL', 'local');
         this.$store.commit('EDIT_SET_LEFT_PANEL', 'table');
-        this.$store.commit('EDIT_LOAD_FILES');
+        switch (this.$store.state.Edit.lastNav) {
+          case '/stat':
+            this.$store.commit('STAT_LOAD_FILES');
+            break;
+          case '/library':
+            this.$store.commit('LIBRARY_LOAD_FILES');
+            break;
+          case '/system':
+            this.$store.commit('SYSTEM_GET_FILES');
+            break;
+          default:
+            this.$store.commit('EDIT_SET_LAST_NAV', '/edit');
+            this.$store.commit('EDIT_LOAD_FILES');
+        }
         this.$store.commit('SET_NOTICE', '读取本地文件');
         this.$store.commit('EDIT_SET_HINT_TYPE', 'notice');
       },
@@ -76,13 +89,13 @@
           this.$store.commit('EDIT_SET_FILES_PAGE', n);
         }
       },
-      newFiles: function () {
-        const x = new Date().toLocaleDateString()
-        const p = this.$store.state.Edit.lastNav
-        saveFile(this, x, p)
-        this.$store.commit('EDIT_SET_HINT_TYPE', 'notice');
-        // this.$store.commit('EDIT_NEW_FILES');
-      },
+      // newFiles: function () {
+      //   const x = new Date().toLocaleDateString()
+      //   const p = this.$store.state.Edit.lastNav
+      //   saveFile(this, x, p)
+      //   this.$store.commit('EDIT_SET_HINT_TYPE', 'notice');
+      //   // this.$store.commit('EDIT_NEW_FILES');
+      // },
     },
   };
 </script>

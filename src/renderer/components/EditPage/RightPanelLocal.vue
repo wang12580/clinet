@@ -19,12 +19,16 @@
       title: {
         get() {
           let x = '用户本地文件'
+          if (this.$store.state.Edit.rightPanel === 'server') { x = '用户远程文件' }
           switch (this.$store.state.Edit.lastNav) {
             case '/stat':
               x = '数据分析文件'
               break;
             case '/library':
               x = '术语字典文件'
+              break;
+            case '/system':
+              x = '本地导入文件'
               break;
             default:
               break
@@ -35,21 +39,18 @@
       xs: {
         get() {
           let x = this.$store.state.Edit.files
-          let file = ''
           switch (this.$store.state.Edit.lastNav) {
             case '/stat':
               x = this.$store.state.Stat.files
-              file = 'stat'
               break;
             case '/library':
               x = this.$store.state.Library.files
-              file = 'library'
+              break;
+            case '/system':
+              x = this.$store.state.System.files
               break;
             default:
               break
-          }
-          if (this.$store.state.Edit.filesIndex !== 0) {
-            loadFile(this, x[this.$store.state.Edit.filesIndex], file, 'edit')
           }
           return x
         },

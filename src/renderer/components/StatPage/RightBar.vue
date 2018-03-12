@@ -39,6 +39,7 @@
             <a id="stat-left-chart-discount" class="nav-link" href="#" v-on:click='showChart("chartLeft", "折线图")'> 折线图 <span class="sr-only">(current)</span></a>
             <a id="stat-left-chart-radar-map" class="nav-link" href="#" v-on:click='showChart("chartLeft", "雷达图")'> 雷达图 <span class="sr-only">(current)</span></a>
             <a id="stat-left-chart-scatter-plot" class="nav-link" href="#" v-on:click='showChart("chartLeft", "散点图")'> 散点图 <span class="sr-only">(current)</span></a>
+            <a id="stat-left-chart-pie-map" class="nav-link" href="#" v-on:click='showChart("chartLeft", "饼图")'> 饼图 <span class="sr-only">(current)</span></a>
           </div>
         </li>
         <li class="nav-item dropdown">
@@ -50,6 +51,7 @@
             <a id="stat-right-chart-discount" class="nav-link" href="#" v-on:click='showChart("chartRight", "折线图")'> 折线图 <span class="sr-only">(current)</span></a>
             <a id="stat-right-chart-radar-map" class="nav-link" href="#" v-on:click='showChart("chartRight", "雷达图")'> 雷达图 <span class="sr-only">(current)</span></a>
             <a id="stat-right-chart-scatter-plot" class="nav-link" href="#" v-on:click='showChart("chartRight", "散点图")'> 散点图 <span class="sr-only">(current)</span></a>
+            <a id="stat-right-chart-pie-map" class="nav-link" href="#" v-on:click='showChart("chartRight", "饼图")'> 饼图 <span class="sr-only">(current)</span></a>
           </div>
         </li>
         <li class="nav-item dropdown">
@@ -75,10 +77,11 @@
   import chartScatter from '../../utils/ChartScatter';
   import chartRadar from '../../utils/ChartRadar';
   import chartBar from '../../utils/ChartBar';
+  import chartPie from '../../utils/ChartPie';
   import addContrast from '../../utils/StatContrast';
   import chartData from '../../utils/ChartData';
   import saveFile from '../../utils/SaveFile';
-  import getStatFiles from '../../utils/StatServerFile';
+  import { getStatFiles, getStat } from '../../utils/StatServerFile';
 
   export default {
     data() {
@@ -89,20 +92,32 @@
     methods: {
       loadData: function () {
         this.$store.commit('STAT_SET_LEFT_PANEL', ['file', null]);
+        this.$store.commit('STAT_SET_TABLE_TYPE', 'local');
         this.$store.commit('STAT_LOAD_FILES');
       },
       serverData: function () {
+        this.$store.commit('STAT_SET_TABLE_TYPE', 'server');
         if (this.$store.state.System.server === '') {
           const key = Object.keys(global.hitbdata.server)
-          const server = global.hitbdata.server[key];
-          console.log(server);
-          getStatFiles(this, ['www.jiankanglaifu.com', '80'])
+          const server = global.hitbdata.server[key][0];
+          getStatFiles(this, [server[0], server[1]])
         } else {
           getStatFiles(this, [this.$store.state.System.server, this.$store.state.System.port])
         }
       },
       page: function (n) {
-        this.$store.commit('STAT_TABLE_PAGE', n);
+        if (this.$store.state.Stat.tableType === 'server') {
+          if (this.$store.state.System.server === '') {
+            this.$store.commit('STAT_TABLE_PAGE', n);
+            const key = Object.keys(global.hitbdata.server)
+            const server = global.hitbdata.server[key][0];
+            getStat(this, [server[0], server[1], this.$store.state.Stat.tableName, this.$store.state.Stat.tablePage])
+          } else {
+            getStat(this, [this.$store.state.System.server, this.$store.state.System.port, this.$store.state.Stat.tableName, this.$store.state.Stat.tablePage])
+          }
+        } else {
+          this.$store.commit('STAT_TABLE_PAGE', n);
+        }
       },
       edit: function () {
         this.$store.commit('EDIT_SET_LAST_NAV', '/stat');
@@ -122,7 +137,7 @@
         } else {
           table = this.$store.state.Stat.compareTable
         }
-        const option = chartData(table, this.$store.state.Stat.selectedRow, this.$store.state.Stat.selectedCol, this.$store.state.Stat.tableType)
+        const option = chartData(table, this.$store.state.Stat.selectedRow, this.$store.state.Stat.selectedCol)
         if (id === 'chartRight') {
           this.$store.commit('STAT_SET_CHART_RIGHT', type);
           switch (type) {
@@ -133,10 +148,13 @@
               chartLine(id, option)
               break;
             case '雷达图':
-              chartRadar(id)
+              chartRadar(id, option)
               break;
             case '散点图':
-              chartScatter(id)
+              chartScatter(id, option)
+              break;
+            case '饼图':
+              chartPie(id, option)
               break;
             default: break;
           }
@@ -150,10 +168,13 @@
               chartLine(id, option)
               break;
             case '雷达图':
-              chartRadar(id)
+              chartRadar(id, option)
               break;
             case '散点图':
-              chartScatter(id)
+              chartScatter(id, option)
+              break;
+            case '饼图':
+              chartPie(id, option)
               break;
             default: break;
           }
