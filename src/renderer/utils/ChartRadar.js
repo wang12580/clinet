@@ -2,9 +2,10 @@ const echarts = require('echarts');
 export default function chartRadar(id, opt = []) {
   // 取得表头并删除前两位
   const th = Object.keys(opt[0])
+  const keys = Object.keys(opt[0])
   // 判断是否存在drg2字段
   let drg2 = false
-  if (th.includes('drg2')) {
+  if (th.includes('drg2') || th.includes('病种')) {
     th.splice(0, 3)
     drg2 = true
   } else {
@@ -34,10 +35,14 @@ export default function chartRadar(id, opt = []) {
   // 生成图的其他字段
   stat.forEach((v) => {
     let name = ''
-    if (drg2) {
+    if (keys.includes('org') && keys.includes('time') && drg2) {
       name = `${v.org} ${v.time} ${v.drg2}`
-    } else {
+    } else if (keys.includes('机构') && keys.includes('时间') && drg2) {
+      name = `${v.机构} ${v.时间} ${v.病种}`
+    } else if (keys.includes('org') && keys.includes('time')) {
       name = `${v.org} ${v.time}`
+    } else {
+      name = `${v.机构} ${v.时间}`
     }
     const value = []
     th.forEach((y) => {

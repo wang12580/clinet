@@ -42,6 +42,8 @@
 </template>
 
 <script>
+  import { getLibraryFiles, getLibrary } from '../../utils/LibraryServerFile';
+  import loadFile from '../../utils/LoadFile';
   export default {
     data() {
       return {
@@ -52,17 +54,42 @@
       loadData: function () {
         this.$store.commit('LIBRARY_SET_LEFT_PANEL', ['file', null]);
         this.$store.commit('LIBRARY_LOAD_FILES');
+        this.$store.commit('LIBRARY_SET_TABLE_TYPE', 'local');
         this.$store.commit('SET_NOTICE', '本地文件');
       },
       serverData: function () {
-        this.$store.commit('LIBRARY_SERVER_FILES');
+        // this.$store.commit('LIBRARY_SERVER_FILES');
         this.$store.commit('SET_NOTICE', '远程文件');
+        this.$store.commit('LIBRARY_SET_TABLE_TYPE', 'server');
+        if (this.$store.state.System.server === '') {
+          const key = Object.keys(global.hitbdata.server)
+          const server = global.hitbdata.server[key][0];
+          getLibraryFiles(this, [server[0], server[1]])
+        } else {
+          getLibraryFiles(this, [this.$store.state.System.server, this.$store.state.System.port])
+        }
       },
       page: function (n) {
-        this.$store.commit('LIBRARY_TABLE_PAGE', [n]);
-        this.$store.commit('SET_NOTICE', '翻页');
+        if (this.$store.state.Library.tableType === 'server') {
+          if (this.$store.state.System.server === '') {
+            this.$store.commit('LIBRARY_TABLE_PAGE', [n]);
+            const key = Object.keys(global.hitbdata.server)
+            const server = global.hitbdata.server[key][0];
+            getLibrary(this, [server[0], server[1], this.$store.state.Library.tableName, this.$store.state.Library.tablePage])
+          } else {
+            this.$store.commit('LIBRARY_TABLE_PAGE', [n]);
+            getLibrary(this, [this.$store.state.System.server, this.$store.state.System.port, this.$store.state.Library.tableName, this.$store.state.Library.tablePage])
+          }
+        } else {
+          this.$store.commit('LIBRARY_TABLE_PAGE', [n]);
+          this.$store.commit('SET_NOTICE', '翻页');
+        }
       },
       edit: function () {
+        if (this.$store.state.Library.fileIndex !== null) {
+          this.$store.commit('EDIT_SET_LEFT_PANEL', 'table');
+          loadFile(this, this.$store.state.Library.files[this.$store.state.Library.fileIndex], 'library', 'edit')
+        }
         this.$store.commit('EDIT_SET_LAST_NAV', '/library');
         this.$store.commit('EDIT_SET_RIGHT_PANEL', 'local');
         this.$store.commit('EDIT_SET_FILES_INDEX', this.$store.state.Library.fileIndex);

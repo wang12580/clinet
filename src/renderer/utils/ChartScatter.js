@@ -3,8 +3,9 @@ export default function chartScatter(id, opt) {
   if (opt) {
     // 取得表头并删除前两位
     const ths = Object.keys(opt[0])
+    const keys = Object.keys(opt[0])
     let drg2 = false
-    if (ths.includes('drg2')) {
+    if (ths.includes('drg2') || ths.includes('病种')) {
       ths.splice(0, 3)
       drg2 = true
     } else {
@@ -16,10 +17,14 @@ export default function chartScatter(id, opt) {
     const series = []
     opt.forEach((v) => {
       let name = ''
-      if (drg2) {
+      if (keys.includes('org') && keys.includes('time') && drg2) {
         name = `${v.org} ${v.time} ${v.drg2}`
-      } else {
+      } else if (keys.includes('机构') && keys.includes('时间') && drg2) {
+        name = `${v.机构} ${v.时间} ${v.病种}`
+      } else if (keys.includes('org') && keys.includes('time')) {
         name = `${v.org} ${v.time}`
+      } else {
+        name = `${v.机构} ${v.时间}`
       }
       const data = []
       th.forEach((y) => {
