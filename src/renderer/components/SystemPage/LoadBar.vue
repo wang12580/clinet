@@ -45,6 +45,13 @@
         paths: []
       };
     },
+    computed: {
+      serverTable: {
+        get() {
+          return this.$store.state.System.serverTable
+        }
+      }
+    },
     methods: {
       loadPath: function () {},
       getFiles: function () {
@@ -76,6 +83,7 @@
       },
       upLoadTableData: function () {
         this.$store.commit('SYSTEM_SET_TOOLBAR', 'upLoadTableData');
+        console.log(this.serverTable);
       },
     },
   };

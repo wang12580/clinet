@@ -43,7 +43,8 @@ const state = {
   wt4TablePage: 0,
   targetIndex: [],
   targetDimension: [],
-  serverStat: { wt4: [], index: [], dimension: [] }
+  serverStat: { wt4: [], index: [], dimension: [] },
+  serverTable: ''
 };
 
 const mutations = {
@@ -201,6 +202,9 @@ const mutations = {
     } else {
       state.serverStat[field[0]] = [...state.serverStat[field[0]], field[1]]
     }
+  },
+  SYSTEM_SET_SERVER_TABLE(state, field) {
+    state.serverTable = field
   }
 };
 
@@ -233,6 +237,7 @@ const actions = {
     commit('SYSTEM_SET_LOCAL_PAGE');
     commit('SYSTEM_GET_TARGET');
     commit('SYSTEM_GET_SERVER_STAT');
+    commit('SYSTEM_SET_SERVER_TABLE');
   },
 };
 

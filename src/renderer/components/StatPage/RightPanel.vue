@@ -109,8 +109,11 @@
           }
           return isType
         })
+        if (data[0] === '机构' && data[1] === '时间') {
+          this.$store.commit('STAT_SET_COL', index);
+        }
         if (value.includes(true)) {
-          if (data[0] === 'org' && data[1] === 'time') {
+          if ((data[0] === 'org' && data[1] === 'time')) {
             this.$store.commit('STAT_SET_COL', index);
           }
         } else {

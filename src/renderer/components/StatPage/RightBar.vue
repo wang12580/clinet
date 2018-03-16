@@ -83,7 +83,6 @@
   import saveFile from '../../utils/SaveFile';
   import { getStatFiles, getStat } from '../../utils/StatServerFile';
   import loadFile from '../../utils/LoadFile';
-
   export default {
     data() {
       return {
@@ -95,6 +94,9 @@
         this.$store.commit('STAT_SET_LEFT_PANEL', ['file', null]);
         this.$store.commit('STAT_SET_TABLE_TYPE', 'local');
         this.$store.commit('STAT_LOAD_FILES');
+        if (this.$store.state.Stat.fileIndex === null) {
+          loadFile(this, this.$store.state.Stat.files[0], 'stat')
+        }
       },
       serverData: function () {
         this.$store.commit('STAT_SET_TABLE_TYPE', 'server');
