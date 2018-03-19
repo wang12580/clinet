@@ -81,7 +81,7 @@
   import addContrast from '../../utils/StatContrast';
   import chartData from '../../utils/ChartData';
   import saveFile from '../../utils/SaveFile';
-  import { getStatFiles, getStat } from '../../utils/StatServerFile';
+  import { getStatFiles, getStat, saveStat } from '../../utils/StatServerFile';
   import loadFile from '../../utils/LoadFile';
 
   export default {
@@ -97,27 +97,21 @@
         this.$store.commit('STAT_LOAD_FILES');
       },
       serverData: function () {
-        this.$store.commit('STAT_SET_TABLE_TYPE', 'server');
-        if (this.$store.state.System.server === '') {
-          const key = Object.keys(global.hitbdata.server)
-          const server = global.hitbdata.server[key][0];
-          getStatFiles(this, [server[0], server[1]])
+        if (!this.$store.state.System.connectInfo) {
+          this.$store.commit('SET_NOTICE', '服务器连接未设置,请在系统服务内连接');
+        } else if (!this.$store.state.System.user.login) {
+          this.$store.commit('SET_NOTICE', '未登录用户,请在系统服务-用户设置内登录');
         } else {
-          getStatFiles(this, [this.$store.state.System.server, this.$store.state.System.port])
+          this.$store.commit('STAT_SET_TABLE_TYPE', 'server');
+          getStatFiles(this, [this.$store.state.System.server, this.$store.state.System.port, '', this.$store.state.System.user.username])
         }
       },
       page: function (n) {
         if (this.$store.state.Stat.tablePage === 0 && n === -1) {
           this.$store.commit('SET_NOTICE', '当前已是第一页')
         } else if (this.$store.state.Stat.tableType === 'server') {
-          if (this.$store.state.System.server === '') {
-            this.$store.commit('STAT_TABLE_PAGE', n);
-            const key = Object.keys(global.hitbdata.server)
-            const server = global.hitbdata.server[key][0];
-            getStat(this, [server[0], server[1], this.$store.state.Stat.tableName, this.$store.state.Stat.tablePage])
-          } else {
-            getStat(this, [this.$store.state.System.server, this.$store.state.System.port, this.$store.state.Stat.tableName, this.$store.state.Stat.tablePage])
-          }
+          this.$store.commit('STAT_TABLE_PAGE', n);
+          getStat(this, [this.$store.state.System.server, this.$store.state.System.port, this.$store.state.Stat.tableName, this.$store.state.Stat.tablePage])
         } else {
           this.$store.commit('STAT_TABLE_PAGE', n);
         }
@@ -139,7 +133,7 @@
         let table = []
         switch (this.$store.state.Stat.tableType) {
           case 'local': {
-            table = this.$store.state.Stat.file
+            table = this.$store.state.Stat.localTable
             break;
           }
           case 'server': {
@@ -195,15 +189,29 @@
         }
       },
       compare: function () {
-        const table = this.$store.state.Stat.tableSel
-        const header = this.$store.state.Stat.tableHeader
+        let table = []
+        let header = []
+        switch (this.$store.state.Stat.tableType) {
+          case 'server':
+            table = this.$store.state.Stat.serverTable
+            header = [this.$store.state.Stat.serverTable[0]]
+            break;
+          case 'local':
+            table = this.$store.state.Stat.tableSel
+            header = this.$store.state.Stat.tableHeader
+            break;
+          default:
+            break;
+        }
         const col = this.$store.state.Stat.selectedCol
         const row = this.$store.state.Stat.selectedRow
         const compareTable = this.$store.state.Stat.compareTable
-        if (col.length > 0 || row.length > 0) {
-          addContrast(this, table, compareTable, header, col, row)
-        } else {
-          this.$store.commit('SET_NOTICE', '请选择加入对比数据!');
+        if (this.$store.state.Stat.tableType !== 'compare') {
+          if (col.length > 0 || row.length > 0) {
+            addContrast(this, table, compareTable, header, col, row)
+          } else {
+            this.$store.commit('SET_NOTICE', '请选择加入对比数据!');
+          }
         }
       },
       showCompare: function () {
@@ -214,7 +222,9 @@
         }
       },
       saveCompare: function () {
-        if (this.$store.state.Stat.compareTable.length > 0) {
+        if (this.$store.state.Stat.tableType === 'server') {
+          saveStat(this, this.$store.state.Stat.compareTable, [this.$store.state.System.server, this.$store.state.System.port, this.$store.state.System.user])
+        } else if (this.$store.state.Stat.compareTable.length > 0) {
           const d = new Date();
           let month = d.getMonth() + 1
           if (month < 10) {

@@ -58,14 +58,13 @@
         this.$store.commit('SET_NOTICE', '本地文件');
       },
       serverData: function () {
-        // this.$store.commit('LIBRARY_SERVER_FILES');
-        this.$store.commit('SET_NOTICE', '远程文件');
-        this.$store.commit('LIBRARY_SET_TABLE_TYPE', 'server');
-        if (this.$store.state.System.server === '') {
-          const key = Object.keys(global.hitbdata.server)
-          const server = global.hitbdata.server[key][0];
-          getLibraryFiles(this, [server[0], server[1]])
+        if (!this.$store.state.System.connectInfo) {
+          this.$store.commit('SET_NOTICE', '服务器连接未设置,请在系统服务内连接');
+        } else if (!this.$store.state.System.user.login) {
+          this.$store.commit('SET_NOTICE', '未登录用户,请在系统服务-用户设置内登录');
         } else {
+          this.$store.commit('SET_NOTICE', '远程文件');
+          this.$store.commit('LIBRARY_SET_TABLE_TYPE', 'server');
           getLibraryFiles(this, [this.$store.state.System.server, this.$store.state.System.port])
         }
       },
@@ -73,15 +72,8 @@
         if (this.$store.state.Library.tablePage === 0 && n === -1) {
           this.$store.commit('SET_NOTICE', '当前已是第一页')
         } else if (this.$store.state.Library.tableType === 'server') {
-          if (this.$store.state.System.server === '') {
-            this.$store.commit('LIBRARY_TABLE_PAGE', [n]);
-            const key = Object.keys(global.hitbdata.server)
-            const server = global.hitbdata.server[key][0];
-            getLibrary(this, [server[0], server[1], this.$store.state.Library.tableName, this.$store.state.Library.tablePage])
-          } else {
-            this.$store.commit('LIBRARY_TABLE_PAGE', [n]);
-            getLibrary(this, [this.$store.state.System.server, this.$store.state.System.port, this.$store.state.Library.tableName, this.$store.state.Library.tablePage])
-          }
+          this.$store.commit('LIBRARY_TABLE_PAGE', [n]);
+          getLibrary(this, [this.$store.state.System.server, this.$store.state.System.port, this.$store.state.Library.tableName, this.$store.state.Library.tablePage])
         } else {
           this.$store.commit('LIBRARY_TABLE_PAGE', [n]);
           this.$store.commit('SET_NOTICE', '翻页');

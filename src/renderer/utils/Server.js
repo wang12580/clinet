@@ -78,6 +78,8 @@ export function sLogin(obj, data) {
   }).then((res) => {
     if (res.data.login) {
       obj.$store.commit('SYSTEM_SET_USER', ['用户登录成功', res.data])
+      obj.$store.commit('SYSTEM_SET_SERVER', ['', data[0], data[1]])
+      obj.$store.commit('SYSTEM_SET_CONNECT_INFO', true)
       obj.$store.commit('SET_NOTICE', '远程服务用户登录成功')
     } else {
       obj.$store.commit('SET_NOTICE', '未注册用户登陆！');
@@ -400,6 +402,28 @@ export function sGetTarget(obj, data) {
     obj.$store.commit('SYSTEM_GET_TARGET', {})
   })
 }
+
+export function sUploadDoc(obj, data) {
+  if (data[3] && data[2]) {
+    const content = data[3].join('\n')
+    const objFile = new File([content], data[2]);
+    const xhr = new XMLHttpRequest();
+    const fd = new FormData();
+    fd.append('file', objFile);
+    xhr.open('POST', `http://${data[0]}:${data[1]}/servers/wt4_upload/`, true);
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4 && xhr.status === 200) {
+        obj.$store.commit('SET_NOTICE', '文件上传成功!')
+        const res = JSON.parse(xhr.responseText)
+        obj.$store.commit('SYSTEM_UPLOAD_FILE', res)
+      } else {
+        obj.$store.commit('SYSTEM_UPLOAD_FILE', {})
+      }
+    }
+    xhr.send(fd);
+  }
+}
+// ======================================
 // 2.2.1 获取分析记录
 export function sGetStat(obj, data) {
   axios.get(`http://${data[0]}:${data[1]}/servers/api/stat_json/`)
@@ -520,19 +544,6 @@ export function sGetSystemDepart(obj, data) {
     });
 }
 // 2.5.1 病案上传
-export function sUploadDoc(obj, data) {
-  axios({
-    method: 'post',
-    url: `http://${data[0]}:${data[1]}/hospitals/json_upload/`,
-    data: qs.stringify({ doc: { wt_code: 'test03', wt_name: '医院2' } }),
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-    responseType: 'json'
-  }).then((res) => {
-    console.log(res)
-  }).catch((err) => {
-    console.log(err)
-  })
-}
 // 2.5.2 病案校验
 export function sCheckDoc(obj, data) {
   axios({

@@ -45,7 +45,9 @@ const state = {
   targetDimension: [],
   serverStat: { wt4: [], index: [], dimension: [] },
   computeVersion: ['CN', 'GB', 'BJ'],
-  computeData: ''
+  computeData: '',
+  serverTable: '',
+  tableType: 'local'
 };
 
 const mutations = {
@@ -66,7 +68,9 @@ const mutations = {
     } else {
       state.connectInfo = false
     }
-    console.log(state.connectInfo)
+  },
+  SYSTEM_SET_CONNECT_INFO(state, r) {
+    state.connectInfo = r
   },
   SYSTEM_GET_FILES(state) {
     state.files = fs.readdirSync(global.hitbdata.path.home).filter(x => x.endsWith('.csv'))
@@ -146,7 +150,7 @@ const mutations = {
   },
   // 读取本地wt4文件目录
   SYSTEM_LOAD_WT4_FILES() {
-    const files = fs.readdirSync(global.hitbdata.path.stat).filter(x => x.endsWith('.csv')).filter(x => x.startsWith('wt4') === true)
+    const files = fs.readdirSync(global.hitbdata.path.stat).filter(x => x.endsWith('.csv'))
     state.wt4Files = files;
   },
   // 读取本地wt4文件
@@ -208,7 +212,16 @@ const mutations = {
   SYSTEM_SET_COMPUTE_DATA(state, value) {
     console.log(value)
     state.computeData = value;
-  }
+  },
+  SYSTEM_SET_SERVER_TABLE(state, field) {
+    state.serverTable = field
+  },
+  SYSTEM_UPLOAD_FILE(state, field) {
+    console.log(field);
+  },
+  SYSTEM_TABLE_TYPE(state, field) {
+    state.tableType = field;
+  },
 };
 
 const actions = {
@@ -241,6 +254,8 @@ const actions = {
     commit('SYSTEM_GET_TARGET');
     commit('SYSTEM_GET_SERVER_STAT');
     commit('SYSTEM_SET_COMPUTE_DATA');
+    commit('SYSTEM_SET_SERVER_TABLE');
+    commit('SYSTEM_TABLE_TYPE');
   },
 };
 

@@ -84,6 +84,7 @@
               break;
             }
           }
+          console.log(table)
           return table
         }
       },
@@ -102,7 +103,7 @@
       onClickTd: function (data, index) {
         const value = this.$store.state.Stat.tableSel.map((x) => {
           let isType = false
-          if (x[index] === '-') {
+          if (x[index] === '-' || x[index] === '') {
             isType = false
           } else {
             isType = true
