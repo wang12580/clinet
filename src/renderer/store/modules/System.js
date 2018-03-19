@@ -43,7 +43,9 @@ const state = {
   wt4TablePage: 0,
   targetIndex: [],
   targetDimension: [],
-  serverStat: { wt4: [], index: [], dimension: [] }
+  serverStat: { wt4: [], index: [], dimension: [] },
+  computeVersion: ['CN', 'GB', 'BJ'],
+  computeData: ''
 };
 
 const mutations = {
@@ -135,11 +137,12 @@ const mutations = {
     }
   },
   SYSTEM_GET_WT4_COMP(state, field) {
-    if (state.wt4Comp.includes(field)) {
-      state.wt4Comp.splice(state.wt4Comp.findIndex(v => v === field), 1)
-    } else {
-      state.wt4Comp = [...state.wt4Comp, field]
-    }
+    state.wt4Comp.forEach((n, index) => {
+      if (n[0].B_WT4_V1_ID === field[0].B_WT4_V1_ID && n[0].version === field[0].version) {
+        state.wt4Comp.splice(index, 1)
+      }
+    })
+    state.wt4Comp = [...state.wt4Comp, field]
   },
   // 读取本地wt4文件目录
   SYSTEM_LOAD_WT4_FILES() {
@@ -201,6 +204,10 @@ const mutations = {
     } else {
       state.serverStat[field[0]] = [...state.serverStat[field[0]], field[1]]
     }
+  },
+  SYSTEM_SET_COMPUTE_DATA(state, value) {
+    console.log(value)
+    state.computeData = value;
   }
 };
 
@@ -233,6 +240,7 @@ const actions = {
     commit('SYSTEM_SET_LOCAL_PAGE');
     commit('SYSTEM_GET_TARGET');
     commit('SYSTEM_GET_SERVER_STAT');
+    commit('SYSTEM_SET_COMPUTE_DATA');
   },
 };
 

@@ -49,10 +49,12 @@
     methods: {
       getLocalData: function () {
         this.$store.commit('SYSTEM_SET_TOOLBAR', 'getLocalData');
+        this.$store.commit('SYSTEM_SET_COMPUTE_DATA', 'getLocalData');
         this.$store.commit('SYSTEM_LOAD_WT4_FILES');
       },
       getServerData: function () {
         this.$store.commit('SYSTEM_SET_TOOLBAR', 'getServerData');
+        this.$store.commit('SYSTEM_SET_COMPUTE_DATA', 'getServerData');
         sGetWt4(this, [this.$store.state.System.server, this.$store.state.System.port, 1])
       },
       compareData: function () {
@@ -62,12 +64,12 @@
         switch (this.$store.state.System.toolbar) {
           case 'getLocalData':
             this.$store.state.System.wt4LocalRow.forEach((n) => {
-              sCompDrg(this, [this.$store.state.System.server, this.$store.state.System.port, this.$store.state.System.wt4Tables[n]], 'getLocalData')
+              sCompDrg(this, [this.$store.state.System.server, this.$store.state.System.port, this.$store.state.System.wt4Tables[n], 'BJ'], 'getLocalData')
             })
             break;
           case 'getServerData':
             this.$store.state.System.wt4Row.forEach((n) => {
-              sCompDrg(this, [this.$store.state.System.server, this.$store.state.System.port, this.$store.state.System.wt4.data[n]])
+              sCompDrg(this, [this.$store.state.System.server, this.$store.state.System.port, this.$store.state.System.wt4.data[n], 'BJ'])
             })
             break;
           default:
