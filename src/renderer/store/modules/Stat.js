@@ -77,20 +77,27 @@ const mutations = {
     state.files = opt.data;
   },
   STAT_SET_LEFT_PANEL(state, opt) {
-    state.leftPanel = opt[0];
-    state.dimensionType = opt[1];
-    switch (opt[1]) {
-      case '机构':
-        state.dimension = state.dimensionOrg
-        break;
-      case '时间':
-        state.dimension = state.dimensionTime
-        break;
-      case '病种':
-        state.dimension = state.dimensionDrg
-        break;
-      default:
-        break;
+    console.log(opt);
+    if (state.tableType === 'local') {
+      state.leftPanel = opt[0];
+      state.dimensionType = opt[1];
+      switch (opt[1]) {
+        case '机构':
+          state.dimension = state.dimensionOrg
+          break;
+        case '时间':
+          state.dimension = state.dimensionTime
+          break;
+        case '病种':
+          state.dimension = state.dimensionDrg
+          break;
+        default:
+          break;
+      }
+    } else {
+      state.leftPanel = opt[0]
+      state.dimension = opt[2]
+      state.dimensionType = opt[1]
     }
   },
   STAT_SET_DIMENSION(state, opt) {
@@ -206,6 +213,23 @@ const mutations = {
   STAT_SET_FILE_FLAG(state) {
     state.selectedRow = [];
     state.selectedCol = [];
+  },
+  STAT_GET_FILE_SEARCH(state, values) {
+    state.localTables = {}
+    const a = state.tableSel.filter(n => n[1] === values || n[0] === values || n[2] === values)
+    //   return n[1] === values || n[0] === values || n[2] === values);
+    const page = Math.ceil(a.length / 20)
+    // const page = 1
+    for (let i = 0; i < page; i += 1) {
+      const f = []
+      f.push(state.tableHeader[0])
+      for (let j = 0; j < 19; j += 1) {
+        f.push(a[(i + 1) * j])
+      }
+      state.localTables[i] = f
+    }
+    console.log(state.localTables);
+    state.localTable = state.localTables[state.tablePage]
   }
 };
 
@@ -228,6 +252,7 @@ const actions = {
     commit('STAT_SET_TABLE_TYPE');
     commit('STAT_SET_FILE_INDEX');
     commit('STAT_SET_FILE_FLAG');
+    commit('STAT_GET_FILE_SEARCH')
   },
 };
 

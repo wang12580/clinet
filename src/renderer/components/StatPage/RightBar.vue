@@ -65,9 +65,9 @@
           </div>
         </li>
       </ul>
-      <form class="form-inline my-2 my-lg-0">
-        <input id="stat-right-search" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-      </form>
+      <div class="form-inline my-2 my-lg-0">
+        <input id="stat-right-search" class="mr-sm-2" type="search" placeholder="Search" aria-label="Search" v-on:keyup.13="statSearch" v-model="stat">
+      </div>
     </div>
   </nav>
 </template>
@@ -81,13 +81,14 @@
   import addContrast from '../../utils/StatContrast';
   import chartData from '../../utils/ChartData';
   import saveFile from '../../utils/SaveFile';
-  import { getStatFiles, getStat, saveStat } from '../../utils/StatServerFile';
+  import { getStatFiles, getStat, saveStat, getList } from '../../utils/StatServerFile';
   import loadFile from '../../utils/LoadFile';
 
   export default {
     data() {
       return {
-        paths: []
+        paths: [],
+        stat: ''
       };
     },
     methods: {
@@ -97,12 +98,11 @@
         this.$store.commit('STAT_LOAD_FILES');
       },
       serverData: function () {
-        if (!this.$store.state.System.connectInfo) {
-          this.$store.commit('SET_NOTICE', '服务器连接未设置,请在系统服务内连接');
-        } else if (!this.$store.state.System.user.login) {
+        if (!this.$store.state.System.user.login) {
           this.$store.commit('SET_NOTICE', '未登录用户,请在系统服务-用户设置内登录');
         } else {
           this.$store.commit('STAT_SET_TABLE_TYPE', 'server');
+          this.$store.commit('STAT_SET_LEFT_PANEL', ['file', null]);
           getStatFiles(this, [this.$store.state.System.server, this.$store.state.System.port, '', this.$store.state.System.user.username])
         }
       },
@@ -127,7 +127,19 @@
         this.$router.push('/edit');
       },
       selX: function (x) {
-        this.$store.commit('STAT_SET_LEFT_PANEL', ['dimension', x]);
+        switch (this.$store.state.Stat.tableType) {
+          case 'local': {
+            this.$store.commit('STAT_SET_LEFT_PANEL', ['dimension', x]);
+            break;
+          }
+          case 'server': {
+            getList(this, [this.$store.state.System.server, this.$store.state.System.port, this.$store.state.Stat.tableName, x, this.$store.state.System.user.username])
+            break;
+          }
+          default: {
+            break;
+          }
+        }
       },
       showChart: function (id, type) {
         let table = []
@@ -222,7 +234,7 @@
         }
       },
       saveCompare: function () {
-        if (this.$store.state.Stat.tableType === 'server') {
+        if (this.$store.state.Stat.tableType === 'server' || this.$store.state.Stat.serverTable !== []) {
           saveStat(this, this.$store.state.Stat.compareTable, [this.$store.state.System.server, this.$store.state.System.port, this.$store.state.System.user])
         } else if (this.$store.state.Stat.compareTable.length > 0) {
           const d = new Date();
@@ -241,6 +253,19 @@
           this.$store.commit('SET_NOTICE', '无法保存对比,请选择对比数据!');
         }
       },
+      statSearch: function () {
+        switch (this.$store.state.Stat.tableType) {
+          case 'local':
+            this.$store.commit('STAT_GET_FILE_SEARCH', this.stat)
+            break;
+          case 'server':
+            console.log(this.$store.state.Stat.tableName);
+            getStat(this, [this.$store.state.System.server, this.$store.state.System.port, this.$store.state.Stat.tableName, 0, this.$store.state.System.user, this.stat])
+            console.log('服务器搜索');
+            break;
+          default:
+        }
+      }
     },
   };
 </script>

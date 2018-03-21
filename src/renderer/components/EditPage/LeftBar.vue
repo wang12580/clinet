@@ -58,6 +58,7 @@
 
 <script>
   import saveFile from '../../utils/SaveFile'
+  import { saveEdit } from '../../utils/EditServerFile'
   export default {
     data() {
       return {
@@ -70,16 +71,19 @@
         this.$store.commit('EDIT_SET_LAST_NAV', '/edit');
       },
       newDoc: function (n) {
-        this.$store.commit('EDIT_SET_DOC')
+        // this.$store.commit('EDIT_SET_DOC')
         this.$store.commit('EDIT_SET_DOC_INDEX', [0, true])
         this.$store.commit('EDIT_SET_FILE_INDEX', this.$store.state.Edit.file.length)
         this.$store.commit('EDIT_SET_LEFT_PANEL', 'doc')
-        console.log(global.hitbmodel[n])
-        if (global.hitbmodel[n] !== undefined) {
-          this.$store.commit('EDIT_LOAD_DOC', global.hitbmodel[n])
+        if (n) {
+          this.$store.commit('EDIT_SET_DOC_TYPE', n)
           this.$store.commit('SET_NOTICE', n);
         } else {
-          this.$store.commit('SET_NOTICE', n);
+          const docType = this.$store.state.Edit.docType
+          if (global.hitbmodel[docType] !== undefined) {
+            this.$store.commit('EDIT_LOAD_DOC', global.hitbmodel[docType])
+            this.$store.commit('SET_NOTICE', docType);
+          }
         }
         document.getElementById('edit-editbar-input').focus()
       },
@@ -92,8 +96,7 @@
       },
       saveFile: function () {
         if (this.$store.state.Edit.serverType === 'show') {
-          console.log(this.$store.state.Edit.files[this.$store.state.Edit.filesIndex]);
-          // saveEdit(this, )
+          saveEdit(this, [this.$store.state.System.server, this.$store.state.System.port, this.$store.state.Edit.files[this.$store.state.Edit.filesIndex], this.$store.state.Edit.file, this.$store.state.System.user.username])
         } else {
           const x = this.$store.state.Edit.files[this.$store.state.Edit.filesIndex]
           const p = this.$store.state.Edit.lastNav
@@ -103,11 +106,9 @@
       save: function (n) {
         const fileIndex = this.$store.state.Edit.fileIndex
         let doc = this.$store.state.Edit.doc
-        // console.log(doc)
         doc = doc.map(x => x.join(' '))
         switch (n) {
           case 0:
-            console.log(this.$store.state.Edit.fileIndex)
             if (this.$store.state.Edit.fileIndex === null) {
               this.$store.commit('SET_NOTICE', '请选择删除内容');
             } else {
