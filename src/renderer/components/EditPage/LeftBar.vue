@@ -49,9 +49,9 @@
           <a class="nav-link text-light" href="#"> 后页 <span class="sr-only">(current)</span></a>
         </li>
       </ul>
-      <form class="form-inline my-2 my-lg-0">
+      <!-- <form class="form-inline my-2 my-lg-0">
         <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-      </form>
+      </form> -->
     </div>
   </nav>
 </template>
@@ -79,11 +79,13 @@
           this.$store.commit('EDIT_SET_DOC_TYPE', n)
           this.$store.commit('SET_NOTICE', n);
         } else {
-          const docType = this.$store.state.Edit.docType
-          if (global.hitbmodel[docType] !== undefined) {
-            this.$store.commit('EDIT_LOAD_DOC', global.hitbmodel[docType])
-            this.$store.commit('SET_NOTICE', docType);
-          }
+          this.$store.commit('EDIT_SET_DOC');
+          this.$store.commit('EDIT_SET_BAR_VALUE', '');
+        // const docType = this.$store.state.Edit.docType
+        // if (global.hitbmodel[docType] !== undefined) {
+        //   this.$store.commit('EDIT_LOAD_DOC', global.hitbmodel[docType])
+        //   this.$store.commit('SET_NOTICE', docType);
+        // }
         }
         document.getElementById('edit-editbar-input').focus()
       },
@@ -92,6 +94,7 @@
           this.$store.commit('SET_NOTICE', '当前已是第一页')
         } else {
           this.$store.commit('EDIT_SET_FILE_PAGE', n);
+          this.$store.commit('SET_NOTICE', '下一页')
         }
       },
       saveFile: function () {

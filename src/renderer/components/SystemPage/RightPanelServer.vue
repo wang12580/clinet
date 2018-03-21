@@ -2,7 +2,7 @@
   <div>
     <div v-if="this.$store.state.System.toolbar === 'getServers'">
       <table>
-        <tr v-for="(data, index) in file" v-bind:key='index' v-on:click="connect(data, index)" v-bind:class="{'table-danger':flag == index && index !== 0}" class="server-rightpanel-tr">
+        <tr v-for="(data, index) in file" v-bind:key='index' v-on:click="connect(data, index)" v-bind:class="{'table-danger':flag == index && index !== 0}" class="server-rightpanel-tr" v-bind:id="'system-td-tr'+index">
           <td v-for="(field, index) in data" v-bind:key='index'>{{data[index]}}</td>
         </tr>
       </table>
@@ -16,18 +16,18 @@
             <form>
                 <div class="form-group">
                   <label class="" for="exampleInputEmail1andname">用户名（远程服务用户是电子邮箱，区块链服务用户是12个单词组成的口令）</label>
-                  <input type="text" class="form-control" placeholder="用户名(邮箱)" v-model="emailorname">
+                  <input type="text" class="form-control" placeholder="用户名(邮箱)" v-model="emailorname" id="server-username">
                 </div>
                 <div class="form-group">
                   <label for="exampleInputPassword1">用户密码（区块链服务用户没有密码，或者使用二级密码）</label>
-                  <input type="password" class="form-control" placeholder="密码" v-model="loginpassword">
+                  <input type="password" class="form-control" placeholder="密码" v-model="loginpassword" id="server-password">
                 </div>
               </form>
-                <button type="submit" class="btn btn-primary" v-on:click="login()">登录</button>
+                <button type="submit" class="btn btn-primary" v-on:click="login()" id="server-login">登录</button>
           </div>
           <div v-if="this.$store.state.System.toolbar === 'createUsers'">
             <div v-if="this.$store.state.System.registerInfo[2] == true">
-              {{this.$store.state.System.registerInfo[1]}}
+              <!-- {{this.$store.state.System.registerInfo[1]}} -->
               <button class="btn btn-primary" v-on:click="newRegister">重新创建用户</button>
             </div>
             <div v-else>
@@ -66,8 +66,25 @@
         <!-- 已登录 -->
         <div v-else>
           <div v-if="this.$store.state.System.toolbar === 'getUsers'">
-            <get-users></get-users>
-            <button type="submit" class="btn btn-primary" v-on:click="orgRegister('userinfo')"  v-if="this.$store.state.System.user.login == true">确认修改</button>
+            <div v-if="this.userInfo === 'info'">
+              <get-users></get-users>
+              <button type="submit" class="btn btn-primary" v-on:click="orgRegister('userinfo')"  v-if="this.$store.state.System.user.login == true">修改</button>
+            </div>
+            <div v-else>
+              <form>
+                <div class="form-group">
+                  <label>新密码</label>
+                  <input type="password" class="form-control" placeholder="新密码" v-model="upUserInfo.password">
+                  <small class="form-text text-muted">请输入新的密码</small>
+                </div>
+                <div class="form-group">
+                  <label>机构</label>
+                  <input type="text" class="form-control" placeholder="新机构" v-model="upUserInfo.org">
+                  <small class="form-text text-muted">请输入新的机构</small>
+                </div>
+              </form>
+              <button class="btn btn-primary" v-on:click="orgRegister('newUserInfo')" >确认修改</button>
+            </div>
           </div>
           <div v-if="this.$store.state.System.toolbar === 'getOrgs'" class ="orgs">
             <get-orgs></get-orgs>
@@ -84,7 +101,7 @@
         </div>
         <!-- 已登录 -->
       <!-- 登录状态 -->
-    </div>
+    <!-- </div> -->
     <!-- <div v-else>
       请连接服务器
     </div> -->
@@ -93,8 +110,6 @@
 </template>
 
 <script>
-  // import { sGetOrg, sCreateOrg, sUpdateOrg, sGetDepart, sCreateDepart, sUpdateDepart, sGetSystemDepart, sUploadDoc, sCheckDoc, sInsertDoc, sStatDoc, sCompDrg, sUpdateUser, sGetStat, sGetStatInfo, sGetStatInfoChart, sdownLoadStatInfo, sSaveDefined, sGetRule, sSearchRule, sGetUser, sLogin, sRegister } from '../../utils/server'
-  // import { sGetUser, sLogin, sRegister, sConnect } from '../../utils/Server'
   import GetUsers from './RightPanelServer/GetUsers';
   import GetOrgs from './RightPanelServer/GetOrgs';
   import CreateOrgs from './RightPanelServer/CreateOrgs';
@@ -115,6 +130,8 @@
         personname: '',
         emailorname: 'test@hitb.com.cn',
         loginpassword: '123456',
+        userInfo: 'info',
+        upUserInfo: { password: '', org: '' }
       }
     },
     computed: {
@@ -145,18 +162,6 @@
       },
     },
     methods: {
-      // logininput: function () {
-      //   const reg = /^([0-9A-Za-z\-_.]+)@([0-9a-z]+\.[a-z]{2,3}(\.[a-z]{2})?)$/g
-      //   if (Array.from(name.split(' ')).length === 12) {
-      //     if (reg.test(this.emailorname)) {
-      //       this.loginpass = true
-      //     } else {
-      //       this.loginpass = false
-      //     }
-      //   } else {
-      //     this.loginpass = true
-      //   }
-      // },
       login: function () {
         const reg = /^([0-9A-Za-z\-_.]+)@([0-9a-z]+\.[a-z]{2,3}(\.[a-z]{2})?)$/g
         const user = { username: this.emailorname, password: this.loginpassword }
@@ -169,24 +174,6 @@
           this.$store.commit('BLOCK_SET_SERVER', server)
           open(this, [server[0], server[1], user.username]);
         }
-
-
-        // if (this.loginpass === false) {
-        //   // alert('区块链登录')
-        //   // sLogin(this, [this.emailorname, this.loginpassword])
-        // } else {
-        //   if (this.loginpassword === '') {
-        //     // alert('请输入密码')
-        //   } else {
-        //     const reg = /^([0-9A-Za-z\-_.]+)@([0-9a-z]+\.[a-z]{2,3}(\.[a-z]{2})?)$/g
-        //     if (!reg.test(this.emailorname)) {
-        //       // alert('用户名必须是邮箱')
-        //     } else {
-        //       sLogin(this, [this.emailorname, this.loginpassword])
-        //     }
-        //   }
-        //   this.$store.state.System.registerInfo[2] = true
-        // }
       },
       connect: function (data, index) {
         this.flag = index
@@ -204,20 +191,23 @@
       },
       orgRegister: function (value) {
         if (value === 'userinfo') {
-          // const userinfo = { username: this.userinfoName, password: this.userinfoPass }
-          const userinfo = {}
-          const arr = [this.userinfoName, this.userinfoPass]
-          const arr1 = ['username', 'password']
-          arr.forEach((n, index) => {
-            if (n !== '') {
-              userinfo[arr1[index]] = n
-            }
-          })
-          sUpdateUser(this, [this.$store.state.System.server, this.$store.state.System.port, this.$store.state.System.user.id, userinfo]
-          )
-          // console.log(userinfo)
-          this.userinfo.name = false
-          this.userinfo.pass = false
+          this.userInfo = 'upUserInfo'
+          console.log(this.upUserInfo);
+          // const userinfo = {}
+          // const arr = [this.userinfoName, this.userinfoPass]
+          // const arr1 = ['username', 'password']
+          // arr.forEach((n, index) => {
+          //   if (n !== '') {
+          //     userinfo[arr1[index]] = n
+          //   }
+          // })
+          // sUpdateUser(this, [this.$store.state.System.server, this.$store.state.System.port, this.$store.state.System.user.id])
+          // )
+          // this.userinfo.name = false
+          // this.userinfo.pass = false
+        } else if (value === 'newUserInfo') {
+          console.log(this.upUserInfo);
+          sUpdateUser(this, [this.$store.state.System.server, this.$store.state.System.port, this.$store.state.System.user.id, this.upUserInfo])
         }
       }
     },
