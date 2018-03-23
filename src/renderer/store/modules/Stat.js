@@ -38,6 +38,8 @@ const state = {
   tableName: '',
   countPage: 0,
   dimensionServer: '',
+  isServer: false,
+  serverCountPage: 0,
 };
 
 const mutations = {
@@ -45,6 +47,7 @@ const mutations = {
     state.files = fs.readdirSync(global.hitbdata.path.stat).filter(x => x.endsWith('.csv'))
   },
   STAT_LOAD_FILE(state, message) {
+    state.isServer = false
     state.file = message;
     state.table = message.map(x => x.split(','))
     state.tableHeader = state.table.slice(0, 1)
@@ -65,7 +68,7 @@ const mutations = {
     for (let i = 0; i < page; i += 1) {
       const f = []
       f.push(state.tableHeader[0])
-      for (let j = 0; j < 19; j += 1) {
+      for (let j = 1; j < 20; j += 1) {
         f.push(state.tableSel[(i + 1) * j])
       }
       state.localTables[i] = f
@@ -73,7 +76,9 @@ const mutations = {
     state.localTable = state.localTables[state.tablePage]
   },
   STAT_TABLE_PAGE(state, n) {
-    if (state.countPage !== n) {
+    if (state.tableType === 'server' && n === 0) {
+      state.tablePage = n;
+    } else if (state.countPage !== n) {
       state.tablePage += n;
       state.localTable = state.localTables[state.tablePage]
     }
@@ -194,9 +199,16 @@ const mutations = {
     state.compareTable = data
   },
   STAT_SET_SERVER_TABLE(state, data) {
-    state.serverTable = data
+    state.isServer = true
+    state.serverTable = data[0]
+    state.serverCountPage = data[1]
   },
   STAT_SET_TABLE_TYPE(state, data) {
+    if (data === 'server') {
+      state.isServer = true
+    } else {
+      state.isServer = false
+    }
     state.tableType = data
   },
   STAT_SET_CHART_LEFT(state, data) {

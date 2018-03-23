@@ -20,9 +20,9 @@
         </div>
       </div>
     </div>
-    <table id="stat-right-table">
+    <table>
       <tr v-for="(data, index) in xs" v-bind:key='index' v-on:click="onClick(data, index)" class="stat-right-table-tr" v-bind:class="{'table-danger':flag.find((n)=>n===index)}">
-        <td v-for="(field, index) in data" v-bind:key='index' v-bind:class="{'table-danger':flagTd.find((n)=>n===index)}" v-on:click="onClickTd(data, index)" id="stat-right-table-td"  v-if="index < 10">{{data[index]}}</td>
+        <td v-for="(field, index) in data" v-bind:key='index' v-bind:class="{'table-danger':flagTd.find((n)=>n===index)}" v-on:click="onClickTd(data, index)" class="stat-right-table-td"  v-if="index < 10">{{data[index]}}</td>
       </tr>
     </table>
   </div>
@@ -73,12 +73,24 @@
       },
       flag: {
         get() {
-          return this.$store.state.Stat.selectedRow
+          let f = []
+          if (this.$store.state.Stat.tableType === 'compare') {
+            f = []
+          } else {
+            f = this.$store.state.Stat.selectedRow
+          }
+          return f
         }
       },
       flagTd: {
         get() {
-          return this.$store.state.Stat.selectedCol
+          let f = []
+          if (this.$store.state.Stat.tableType === 'compare') {
+            f = []
+          } else {
+            f = this.$store.state.Stat.selectedCol
+          }
+          return f
         }
       }
     },
@@ -129,7 +141,6 @@
         switch (type) {
           case '柱状图':
             chartBar(id, option)
-            this.$store.commit('STAT_SET_CHART_OPTION', [id, type, option])
             break;
           case '折线图':
             chartLine(id, option)
