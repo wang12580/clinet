@@ -27,8 +27,8 @@
           </a>
           <div class="dropdown-menu" aria-labelledby="library-dropdown">
             <!-- <a class="nav-link" href="#" v-on:click='selX("机构")' id="library-dropdown-org"> 机构 <span class="sr-only">(current)</span></a> -->
-            <a class="nav-link" href="#" v-on:click='selX("时间")' id="library-dropdown-time"> 时间 <span class="sr-only">(current)</span></a>
-            <a class="nav-link" href="#" v-on:click='selX("版本")' id="library-dropdown-version"> 版本 <span class="sr-only">(current)</span></a>
+            <a class="nav-link" href="#" v-on:click='selX("year")' id="library-dropdown-time"> 年份 <span class="sr-only">(current)</span></a>
+            <a class="nav-link" href="#" v-on:click='selX("version")' id="library-dropdown-version"> 版本 <span class="sr-only">(current)</span></a>
             <div class="dropdown-divider"></div>
             <!-- <a class="nav-link" href="#" v-on:click='selX(null)'> 添加列维度 <span class="sr-only">(current)</span></a> -->
           </div>
@@ -42,7 +42,7 @@
 </template>
 
 <script>
-  import { getLibraryFiles, getLibrary } from '../../utils/LibraryServerFile';
+  import { getLibraryFiles, getLibrary, getList } from '../../utils/LibraryServerFile';
   import loadFile from '../../utils/LoadFile';
   export default {
     data() {
@@ -64,35 +64,73 @@
         } else {
           this.$store.commit('SET_NOTICE', '远程文件');
           this.$store.commit('LIBRARY_SET_TABLE_TYPE', 'server');
+          this.$store.commit('LIBRARY_SET_LEFT_PANEL', ['file', null]);
           getLibraryFiles(this, [this.$store.state.System.server, this.$store.state.System.port])
         }
       },
       page: function (n) {
-        if (this.$store.state.Library.tablePage === 0 && n === -1) {
-          this.$store.commit('SET_NOTICE', '当前已是第一页')
-        } else if (this.$store.state.Library.tableType === 'server') {
-          this.$store.commit('LIBRARY_TABLE_PAGE', [n]);
-          getLibrary(this, [this.$store.state.System.server, this.$store.state.System.port, this.$store.state.Library.tableName, this.$store.state.Library.tablePage])
-        } else {
-          this.$store.commit('LIBRARY_TABLE_PAGE', [n]);
-          this.$store.commit('SET_NOTICE', '翻页');
+        switch (this.$store.state.Library.tableType) {
+          case 'server':
+            if (this.$store.state.Library.serverTable.page === 1 && n === -1) {
+              this.$store.commit('SET_NOTICE', '当前已是第一页')
+            } else if (this.$store.state.Library.serverTable.page === this.$store.state.Library.serverTable.countPage && n === 1) {
+              this.$store.commit('SET_NOTICE', '当前已是尾页');
+            } else {
+              this.$store.commit('LIBRARY_TABLE_PAGE', [n]);
+              getLibrary(this, [this.$store.state.System.server, this.$store.state.System.port, this.$store.state.Library.serverTable.tableName, this.$store.state.Library.tablePage, this.$store.state.Library.dimensionType, this.$store.state.Library.dimensionServer])
+            }
+            break;
+          case 'local':
+            if (this.$store.state.Library.tablePage === 1 && n === -1) {
+              this.$store.commit('SET_NOTICE', '当前已是第一页')
+            } else if (this.$store.state.Library.tablePage === this.$store.state.Library.tableCountPage && n === 1) {
+              this.$store.commit('SET_NOTICE', '当前已是尾页');
+            } else {
+              this.$store.commit('LIBRARY_TABLE_PAGE', [n]);
+              this.$store.commit('SET_NOTICE', `当前${this.$store.state.Library.tablePage}页,共${this.$store.state.Library.tableCountPage}页`)
+            }
+            break;
+          default:
+            break;
         }
       },
       edit: function () {
-        if (this.$store.state.Library.fileIndex !== null) {
+        if (this.$store.state.Library.tableType === 'server') {
+          const data = this.$store.state.Library.serverTable.data
+          const f = data.map(x => x.join(','))
           this.$store.commit('EDIT_SET_LEFT_PANEL', 'table');
-          loadFile(this, this.$store.state.Library.files[this.$store.state.Library.fileIndex], 'library', 'edit')
+          this.$store.commit('EDIT_SET_LAST_NAV', '/library');
+          this.$store.commit('EDIT_SET_RIGHT_PANEL', 'server');
+          this.$store.commit('EDIT_SET_FILES_INDEX', 0);
+          this.$store.commit('EDIT_LOAD_FILE', f);
+          this.$store.commit('EDIT_SET_LEFT_PANEL', 'table')
+        } else {
+          if (this.$store.state.Library.fileIndex !== null) {
+            this.$store.commit('EDIT_SET_LEFT_PANEL', 'table');
+            loadFile(this, this.$store.state.Library.files[this.$store.state.Library.fileIndex], 'library', 'edit')
+          }
+          this.$store.commit('EDIT_SET_LAST_NAV', '/library');
+          this.$store.commit('EDIT_SET_RIGHT_PANEL', 'local');
+          this.$store.commit('EDIT_SET_FILES_INDEX', this.$store.state.Library.fileIndex);
         }
-        this.$store.commit('EDIT_SET_LAST_NAV', '/library');
-        this.$store.commit('EDIT_SET_RIGHT_PANEL', 'local');
-        this.$store.commit('EDIT_SET_FILES_INDEX', this.$store.state.Library.fileIndex);
         this.$router.push('/edit');
-        // this.$store.commit('GET_PATH', 'paths');
       },
       selX: function (x) {
-        this.$store.commit('LIBRARY_SET_LEFT_PANEL', ['dimension', x]);
-        this.$store.commit('SET_NOTICE', '区块列表');
-        this.$store.commit('SET_NOTICE', '维度选择');
+        switch (this.$store.state.Library.tableType) {
+          case 'local': {
+            this.$store.commit('LIBRARY_SET_LEFT_PANEL', ['dimension', x]);
+            this.$store.commit('SET_NOTICE', '区块列表');
+            this.$store.commit('SET_NOTICE', '维度选择');
+            break;
+          }
+          case 'server': {
+            getList(this, [this.$store.state.System.server, this.$store.state.System.port], this.$store.state.Library.serverTable.tableName, x, this.$store.state.System.user.username)
+            break;
+          }
+          default: {
+            break;
+          }
+        }
       },
       librarySearch: function () {
         switch (this.$store.state.Library.tableType) {
@@ -100,7 +138,7 @@
             this.$store.commit('LIBRARY_GET_SEARCH_TABLE', this.library)
             break;
           case 'server':
-            getLibrary(this, [this.$store.state.System.server, this.$store.state.System.port, this.$store.state.Stat.tableName, 0, this.library])
+            getLibrary(this, [this.$store.state.System.server, this.$store.state.System.port, this.$store.state.Library.serverTable.tableName, 1, this.$store.state.Library.dimensionType, this.$store.state.Library.dimensionServer])
             break;
           default:
         }

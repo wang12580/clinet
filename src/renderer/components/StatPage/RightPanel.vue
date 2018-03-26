@@ -25,6 +25,13 @@
         <td v-for="(field, index) in data" v-bind:key='index' v-bind:class="{'table-danger':flagTd.find((n)=>n===index)}" v-on:click="onClickTd(data, index)" class="stat-right-table-td"  v-if="index < 10">{{data[index]}}</td>
       </tr>
     </table>
+    <nav aria-label="Page navigation example" v-if="this.$store.state.Stat.tableType === 'server'">
+      <ul class="pagination">
+        <li class="page-item" v-for= "(value, index) in page.pageList" v-bind:key="index" v-bind:class="{'disabled':value.page == page.page}" v-on:click="serverPage(value.page)"><a class="page-link" href="#">
+          {{value.num}}
+        </a></li>
+      </ul>
+    </nav>
   </div>
 </template>
 
@@ -37,6 +44,7 @@
   import chartPie from '../../utils/ChartPie';
   import RightBar from './RightBar';
   import LeftPanel from './LeftPanel';
+  import { getStat } from '../../utils/StatServerFile'
   export default {
     components: { RightBar, LeftPanel },
     data() {
@@ -60,7 +68,7 @@
               break;
             }
             case 'server': {
-              table = this.$store.state.Stat.serverTable
+              table = this.$store.state.Stat.serverTable.data
               break;
             }
             default: {
@@ -91,6 +99,11 @@
             f = this.$store.state.Stat.selectedCol
           }
           return f
+        }
+      },
+      page: {
+        get() {
+          return { pageList: this.$store.state.Stat.serverTable.pageList, page: this.$store.state.Stat.serverTable.page }
         }
       }
     },
@@ -133,51 +146,53 @@
         if (this.$store.state.Stat.tableType === 'local') {
           table = this.$store.state.Stat.localTable
         } else if (this.$store.state.Stat.tableType === 'server') {
-          table = this.$store.state.Stat.serverTable
+          table = this.$store.state.Stat.serverTable.data
         } else {
           table = this.$store.state.Stat.compareTable
         }
-        const option = chartData(table, this.flag, this.flagTd)
+        chartData(this, table, this.flag, this.flagTd)
         switch (type) {
           case '柱状图':
-            chartBar(id, option)
+            chartBar(id, this.$store.state.Stat.chartData)
             break;
           case '折线图':
-            chartLine(id, option)
+            chartLine(id, this.$store.state.Stat.chartData)
             break;
           case '雷达图':
-            chartRadar(id, option)
+            chartRadar(id, this.$store.state.Stat.chartData)
             break;
           case '散点图':
-            chartScatter(id, option)
+            chartScatter(id, this.$store.state.Stat.chartData)
             break;
           case '饼图':
-            chartPie(id, option)
+            chartPie(id, this.$store.state.Stat.chartData)
             break;
           default: break;
         }
         const idRight = 'chartRight'
         const typeRight = this.$store.state.Stat.chartRight
-        const optionRight = chartData(table, this.flag, this.flagTd)
         switch (typeRight) {
           case '柱状图':
-            chartBar(idRight, optionRight)
+            chartBar(idRight, this.$store.state.Stat.chartData)
             break;
           case '折线图':
-            chartLine(idRight, optionRight)
+            chartLine(idRight, this.$store.state.Stat.chartData)
             break;
           case '雷达图':
-            chartRadar(idRight, optionRight)
+            chartRadar(idRight, this.$store.state.Stat.chartData)
             break;
           case '散点图':
-            chartScatter(idRight, optionRight)
+            chartScatter(idRight, this.$store.state.Stat.chartData)
             break;
           case '饼图':
-            chartPie(idRight, optionRight)
+            chartPie(idRight, this.$store.state.Stat.chartData)
             break;
           default: break;
         }
       },
+      serverPage: function (data) {
+        getStat(this, [this.$store.state.System.server, this.$store.state.System.port], { tableName: this.$store.state.Stat.serverTable.tableName, page: parseInt(data, 10), username: this.$store.state.System.user.username, type: this.$store.state.Stat.dimensionType, value: this.$store.state.Stat.dimensionServer })
+      }
     },
   };
 </script>

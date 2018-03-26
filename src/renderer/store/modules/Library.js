@@ -7,7 +7,8 @@ const state = {
   tableSel: [],
   localTables: [],
   localTable: [],
-  tablePage: 0,
+  tablePage: 1,
+  tableCountPage: 0,
   leftPanel: 'file',
   dimension: [],
   dimensionType: null,
@@ -17,13 +18,12 @@ const state = {
   field: '',
   fieldIndex: null,
   tableHeader: [],
-  serverTable: [],
   fileIndex: null,
   tableType: 'local',
-  tableName: '',
-  serverTablePage: {},
+  serverTable: { page: 1, countPage: 0, data: [], pageList: [], tableName: '' },
   dimensionSearch: { time: 0, version: 0, org: 0 },
-  rowHeight: null
+  rowHeight: null,
+  dimensionServer: '',
 };
 
 const mutations = {
@@ -48,12 +48,14 @@ const mutations = {
       `时间维度总数：${state.dimensionTime.length - 1}`,
       `版本维度总数：${state.dimensionVersion.length - 1}`,
     ]
-    const page = Math.ceil(state.tableSel.length / 20)
-    for (let i = 0; i <= page; i += 1) {
+    state.tablePage = 1;
+    const page = Math.ceil(state.tableSel.length / 35)
+    state.tableCountPage = page
+    for (let i = 1; i <= page; i += 1) {
       const f = []
       f.push(state.tableHeader[0])
-      for (let j = 1; j < 20; j += 1) {
-        f.push(state.tableSel[(i + 1) * j])
+      for (let j = 1; j <= 35; j += 1) {
+        f.push(state.tableSel[(i) * j])
       }
       state.localTables[i] = f
     }
@@ -64,39 +66,45 @@ const mutations = {
   },
   LIBRARY_TABLE_PAGE(state, m) {
     if (m[1]) {
-      state.tablePage = 0;
+      state.tablePage = 1;
     } else {
       state.tablePage += m[0];
     }
-    const page = Math.ceil(state.tableSel.length / 20)
-    if (state.tablePage > page) {
+    const page = Math.ceil(state.tableSel.length / 35)
+    if (state.tablePage > page && state.tableType !== 'server') {
       state.tablePage = page
-    } else if (state.tablePage < 0) {
-      state.tablePage = 0
+    } else if (state.tablePage < 1) {
+      state.tablePage = 1
     }
-    // if (state.tablePage < 0) {  }
-    // const maxPage = Math.floor(state.file.length / 100)
-    // if (state.tablePage > maxPage) {
-    //   state.tablePage = maxPage
-    // }
-    // console.log(state.tablePage);
     state.localTable = state.localTables[state.tablePage]
   },
+  LIBRARY_SET_TABLE_PAGE(state, page) {
+    state.tablePage = page;
+  },
+  LIBRARY_SET_SERVER_DIMENSION(state, index) {
+    state.dimensionServer = index
+  },
   LIBRARY_SET_LEFT_PANEL(state, opt) {
-    state.leftPanel = opt[0];
-    state.dimensionType = opt[1];
-    switch (opt[1]) {
-      case '机构':
-        state.dimension = state.dimensionOrg
-        break;
-      case '时间':
-        state.dimension = state.dimensionTime
-        break;
-      case '版本':
-        state.dimension = state.dimensionVersion
-        break;
-      default:
-        break;
+    if (state.tableType === 'local') {
+      state.leftPanel = opt[0];
+      state.dimensionType = opt[1];
+      switch (opt[1]) {
+        case 'org':
+          state.dimension = state.dimensionOrg
+          break;
+        case 'year':
+          state.dimension = state.dimensionTime
+          break;
+        case 'version':
+          state.dimension = state.dimensionVersion
+          break;
+        default:
+          break;
+      }
+    } else {
+      state.leftPanel = opt[0];
+      state.dimensionType = opt[1];
+      state.dimension = opt[2];
     }
   },
   LIBRARY_SET_DIMENSION(state, opt) {
@@ -123,12 +131,13 @@ const mutations = {
     state.notice = [
       `术语总数：${state.tableSel.length - 1}`
     ]
-    const page = Math.ceil(state.tableSel.length / 20)
-    for (let i = 0; i <= page; i += 1) {
+    const page = Math.ceil(state.tableSel.length / 35)
+    state.tableCountPage = page
+    for (let i = 1; i <= page; i += 1) {
       const f = []
       f.push(state.tableHeader[0])
-      for (let j = 1; j < 20; j += 1) {
-        f.push(state.tableSel[(i + 1) * j])
+      for (let j = 1; j <= 35; j += 1) {
+        f.push(state.tableSel[(i) * j])
       }
       state.localTables[i] = f
     }
@@ -146,22 +155,19 @@ const mutations = {
   LIBRARY_SET_TABLE_TYPE(state, index) {
     state.tableType = index;
   },
-  LIBRARY_TABLE_NAME(state, index) {
-    state.tableName = index
-  },
-  LIBRARY_SET_SERVER_TABLE(state, data) {
-    state.serverTable = data.library
-    state.serverTablePage = { page_list: data.page_list, page_num: data.page_num }
+  LIBRARY_SET_SERVER_TABLE(state, opt) {
+    state.serverTable = opt
   },
   LIBRARY_GET_SEARCH_TABLE(state, data) {
     state.localTables = {}
     const a = state.tableSel.filter(n => n.includes(data));
-    const page = Math.ceil(a.length / 20)
-    for (let i = 0; i < page; i += 1) {
+    const page = Math.ceil(a.length / 35)
+    state.tableCountPage = page
+    for (let i = 1; i < page; i += 1) {
       const f = []
       f.push(state.tableHeader[0])
-      for (let j = 0; j < 19; j += 1) {
-        f.push(a[(i + 1) * j])
+      for (let j = 1; j <= 35; j += 1) {
+        f.push(a[(i) * j])
       }
       state.localTables[i] = f
     }
@@ -184,9 +190,10 @@ const actions = {
     commit('LIBRARY_GET_FIELD_INDEX');
     commit('LIBRARY_SET_FILE_INDEX');
     commit('LIBRARY_SET_TABLE_TYPE');
-    commit('LIBRARY_TABLE_NAME');
     commit('LIBRARY_GET_SEARCH_TABLE');
     commit('LIBRARY_GET_ROW');
+    commit('LIBRARY_SET_TABLE_PAGE');
+    commit('LIBRARY_SET_SERVER_DIMENSION');
   },
 };
 

@@ -33,14 +33,8 @@
         this.$store.commit('LIBRARY_GET_ROW', 0);
         this.$store.commit('LIBRARY_SET_FILE_INDEX', index);
         if (this.$store.state.Library.tableType === 'server') {
-          if (this.$store.state.System.server === '') {
-            const key = Object.keys(global.hitbdata.server)
-            const server = global.hitbdata.server[key][0];
-            getLibrary(this, [server[0], server[1], data, 0])
-          } else {
-            getLibrary(this, [this.$store.state.System.server, this.$store.state.System.port, data, 0])
-          }
-          this.$store.commit('LIBRARY_TABLE_NAME', data);
+          this.$store.commit('LIBRARY_SET_TABLE_PAGE', 1);
+          getLibrary(this, [this.$store.state.System.server, this.$store.state.System.port, data, 1])
         } else {
           loadFile(this, data, 'library')
           this.$store.commit('LIBRARY_SET_TABLE_TYPE', 'local');
