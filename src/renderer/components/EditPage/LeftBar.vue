@@ -39,9 +39,6 @@
         <li class="nav-item" id="edit-leftbar-del" v-on:click="save(0)">
           <a class="nav-link text-light" href="#">删除</a>
         </li>
-        <!-- <li class="nav-item" id="edit-leftbar-file" v-on:click="saveFile">
-          <a class="nav-link text-light" href="#">写入文件</a>
-        </li> -->
         <li class="nav-item active" id="edit-leftbar-uppage" v-on:click='page(-1)' v-if="this.$store.state.Edit.leftPanel == 'table'">
           <a class="nav-link text-light" href="#"> 前页 <span class="sr-only">(current)</span></a>
         </li>
@@ -49,7 +46,7 @@
           <a class="nav-link text-light" href="#"> 后页 <span class="sr-only">(current)</span></a>
         </li>
       </ul>
-      <form class="form-inline my-2 my-lg-0">
+      <form class="form-inline my-2 my-lg-0" v-on:submit.prevent>
         <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" v-on:keyup.enter="leftEnter" v-model="leftItem">
       </form>
     </div>
@@ -59,6 +56,8 @@
 <script>
   import saveFile from '../../utils/SaveFile'
   import { saveEdit } from '../../utils/EditServerFile'
+  import { getStat } from '../../utils/StatServerFile'
+  import { getLibrary } from '../../utils/LibraryServerFile';
   export default {
     data() {
       return {
@@ -91,11 +90,28 @@
         document.getElementById('edit-editbar-input').focus()
       },
       page: function (n) {
-        if (this.$store.state.Edit.filePage === 0 && n === -1) {
-          this.$store.commit('SET_NOTICE', '当前已是第一页')
-        } else {
-          this.$store.commit('EDIT_SET_FILE_PAGE', n);
-          this.$store.commit('SET_NOTICE', '下一页')
+        if (this.$store.state.Edit.rightPanel === 'server') {
+          switch (this.$store.state.Edit.lastNav) {
+            case '/library':
+              this.$store.commit('LIBRARY_TABLE_PAGE', [n]);
+              getLibrary(this, [this.$store.state.System.server, this.$store.state.System.port, this.$store.state.Library.serverTable.tableName, this.$store.state.Library.tablePage, this.$store.state.Library.dimensionType, this.$store.state.Library.dimensionServer])
+              this.$store.commit('EDIT_LOAD_FILE', this.$store.state.Library.serverTable.data.map(x => x.join(',')))
+              break;
+            case '/stat':
+              this.$store.commit('STAT_TABLE_PAGE', n);
+              getStat(this, [this.$store.state.System.server, this.$store.state.System.port], { tableName: this.$store.state.Stat.serverTable.tableName, page: this.$store.state.Stat.tablePage, username: this.$store.state.System.user.username, type: this.$store.state.Stat.dimensionType, value: this.$store.state.Stat.dimensionServer })
+              this.$store.commit('EDIT_LOAD_FILE', this.$store.state.Stat.serverTable.data.map(x => x.join(',')))
+              break;
+            default:
+              break;
+          }
+        } else if (this.$store.state.Edit.rightPanel === 'local') {
+          if (this.$store.state.Edit.filePage === 0 && n === -1) {
+            this.$store.commit('SET_NOTICE', '当前已是第一页')
+          } else {
+            this.$store.commit('EDIT_SET_FILE_PAGE', n);
+            this.$store.commit('SET_NOTICE', '下一页')
+          }
         }
       },
       save: function (n) {
@@ -135,10 +151,12 @@
       },
       leftEnter(e) {
         const doc = this.$store.state.Edit.doc
-        doc.map((x, key) => {
-          const index1 = x.indexOf(e.target.value)
+        const indexArr = []
+        doc.map((x) => {
+          indexArr.push(x.indexOf(e.target.value))
+          const index1 = indexArr.indexOf(0)
           if (index1 > -1) {
-            this.$store.commit('EDIT_SEARCH_DOC_INDEX', key);
+            this.$store.commit('EDIT_SEARCH_DOC_INDEX', index1);
             this.$store.commit('SET_NOTICE', '')
           } else {
             this.$store.commit('SET_NOTICE', '未查找到，请输入正确内容！')

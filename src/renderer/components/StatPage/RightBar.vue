@@ -122,11 +122,11 @@
           case 'local':
             if (this.$store.state.Stat.tablePage === 1 && n === -1) {
               this.$store.commit('SET_NOTICE', '当前已是第一页')
-            } else if (this.$store.state.Stat.tablePage === this.$store.state.Stat.tableCountPage && n === 1) {
+            } else if (this.$store.state.Stat.tablePage === this.$store.state.Stat.countPage && n === 1) {
               this.$store.commit('SET_NOTICE', '当前已是尾页');
             } else {
               this.$store.commit('STAT_TABLE_PAGE', n);
-              this.$store.commit('SET_NOTICE', `当前${this.$store.state.Stat.tablePage}页,共${this.$store.state.Stat.tableCountPage}页`)
+              this.$store.commit('SET_NOTICE', `当前${this.$store.state.Stat.tablePage}页,共${this.$store.state.Stat.countPage}页`)
             }
             break;
           default:
@@ -151,7 +151,6 @@
             this.$store.commit('EDIT_SET_RIGHT_PANEL', 'server');
             this.$store.commit('EDIT_SET_FILES_INDEX', 0);
             this.$store.commit('EDIT_LOAD_FILE', f);
-            this.$store.commit('EDIT_SET_LEFT_PANEL', 'table')
             break;
           default:
         }
