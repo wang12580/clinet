@@ -29,6 +29,7 @@
             <!-- <a class="nav-link" href="#" v-on:click='selX("机构")' id="library-dropdown-org"> 机构 <span class="sr-only">(current)</span></a> -->
             <a class="nav-link" href="#" v-on:click='selX("year")' id="library-dropdown-time"> 年份 <span class="sr-only">(current)</span></a>
             <a class="nav-link" href="#" v-on:click='selX("version")' id="library-dropdown-version"> 版本 <span class="sr-only">(current)</span></a>
+            <a class="nav-link" href="#" v-on:click='selX("all")' id="library-dropdown-version"> 全部 <span class="sr-only">(current)</span></a>
             <div class="dropdown-divider"></div>
             <!-- <a class="nav-link" href="#" v-on:click='selX(null)'> 添加列维度 <span class="sr-only">(current)</span></a> -->
           </div>
@@ -95,9 +96,13 @@
         }
       },
       edit: function () {
+        let f = []
         if (this.$store.state.Library.tableType === 'server') {
-          const data = this.$store.state.Library.serverTable.data
-          const f = data.map(x => x.join(','))
+          f = this.$store.state.Library.serverTable.data.map(x => x.join(','))
+        } else {
+          f = this.$store.state.Library.localTable.map(x => x.join(','))
+        }
+        if (this.$store.state.Library.tableType === 'server') {
           this.$store.commit('EDIT_SET_LEFT_PANEL', 'table');
           this.$store.commit('EDIT_SET_LAST_NAV', '/library');
           this.$store.commit('EDIT_SET_RIGHT_PANEL', 'server');
@@ -107,7 +112,7 @@
         } else {
           if (this.$store.state.Library.fileIndex !== null) {
             this.$store.commit('EDIT_SET_LEFT_PANEL', 'table');
-            loadFile(this, this.$store.state.Library.files[this.$store.state.Library.fileIndex], 'library', 'edit')
+            this.$store.commit('EDIT_LOAD_FILE', f);
           }
           this.$store.commit('EDIT_SET_LAST_NAV', '/library');
           this.$store.commit('EDIT_SET_RIGHT_PANEL', 'local');
@@ -118,13 +123,22 @@
       selX: function (x) {
         switch (this.$store.state.Library.tableType) {
           case 'local': {
-            this.$store.commit('LIBRARY_SET_LEFT_PANEL', ['dimension', x]);
-            this.$store.commit('SET_NOTICE', '区块列表');
-            this.$store.commit('SET_NOTICE', '维度选择');
+            if (x === 'all') {
+              this.$store.commit('LIBRARY_SET_LEFT_PANEL', ['file', null]);
+              loadFile(this, this.$store.state.Library.files[this.$store.state.Library.fileIndex], 'library')
+            } else {
+              this.$store.commit('LIBRARY_SET_LEFT_PANEL', ['dimension', x]);
+              this.$store.commit('SET_NOTICE', '维度选择');
+            }
             break;
           }
           case 'server': {
-            getList(this, [this.$store.state.System.server, this.$store.state.System.port], this.$store.state.Library.serverTable.tableName, x, this.$store.state.System.user.username)
+            if (x === 'all') {
+              this.$store.commit('LIBRARY_SET_LEFT_PANEL', ['file', null]);
+              getLibrary(this, [this.$store.state.System.server, this.$store.state.System.port, this.$store.state.Library.serverTable.tableName, this.$store.state.Library.serverTable.page, this.$store.state.Library.dimensionType, this.$store.state.Library.dimensionServer])
+            } else {
+              getList(this, [this.$store.state.System.server, this.$store.state.System.port], this.$store.state.Library.serverTable.tableName, x, this.$store.state.System.user.username)
+            }
             break;
           }
           default: {

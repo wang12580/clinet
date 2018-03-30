@@ -62,12 +62,13 @@
             <a id="stat-right-dimension-org" class="nav-link" href="#" v-on:click='selX("机构")'> 机构 <span class="sr-only">(current)</span></a>
             <a id="stat-right-dimension-time" class="nav-link" href="#" v-on:click='selX("时间")'> 时间 <span class="sr-only">(current)</span></a>
             <a id="stat-right-dimension-disease" class="nav-link" href="#" v-on:click='selX("病种")'> 病种 <span class="sr-only">(current)</span></a>
+            <a id="stat-right-dimension-disease" class="nav-link" href="#" v-on:click='selX("全部")'> 全部 <span class="sr-only">(current)</span></a>
           </div>
         </li>
       </ul>
-      <div class="form-inline my-2 my-lg-0">
-        <input id="stat-right-search" class="mr-sm-2" type="search" placeholder="Search" aria-label="Search" v-on:keyup.13="statSearch" v-model="stat">
-      </div>
+      <form class="form-inline my-2 my-lg-0" v-on:submit.prevent>
+        <input id="stat-right-search" class="mr-sm-2 form-control" type="search" placeholder="Search" aria-label="Search" v-on:keyup.13="statSearch" v-model="stat">
+      </form>
     </div>
   </nav>
 </template>
@@ -122,7 +123,7 @@
           case 'local':
             if (this.$store.state.Stat.tablePage === 1 && n === -1) {
               this.$store.commit('SET_NOTICE', '当前已是第一页')
-            } else if (this.$store.state.Stat.tablePage === this.$store.state.Stat.countPage && n === 1) {
+            } else if ((this.$store.state.Stat.tablePage === this.$store.state.Stat.countPage && n === 1) || this.$store.state.Stat.countPage === 0) {
               this.$store.commit('SET_NOTICE', '当前已是尾页');
             } else {
               this.$store.commit('STAT_TABLE_PAGE', n);
@@ -134,14 +135,17 @@
         }
       },
       edit: function () {
-        console.log(this.$store.state.Stat.serverTable.data);
-        const data = this.$store.state.Stat.serverTable.data
-        const f = data.map(x => x.join(','))
+        let f = []
+        if (this.$store.state.Stat.isServer) {
+          f = this.$store.state.Stat.serverTable.data.map(x => x.join(','))
+        } else {
+          f = this.$store.state.Stat.localTable.map(x => x.join(','))
+        }
         switch (this.$store.state.Stat.tableType) {
           case 'local':
             if (this.$store.state.Stat.fileIndex !== null) {
               this.$store.commit('EDIT_SET_LEFT_PANEL', 'table');
-              loadFile(this, this.$store.state.Stat.files[this.$store.state.Stat.fileIndex], 'stat', 'edit')
+              this.$store.commit('EDIT_LOAD_FILE', f);
             }
             this.$store.commit('EDIT_SET_RIGHT_PANEL', 'local');
             this.$store.commit('EDIT_SET_FILES_INDEX', this.$store.state.Stat.fileIndex);
@@ -160,11 +164,22 @@
       selX: function (x) {
         switch (this.$store.state.Stat.tableType) {
           case 'local': {
-            this.$store.commit('STAT_SET_LEFT_PANEL', ['dimension', x]);
+            if (x === '全部') {
+              this.$store.commit('STAT_SET_LEFT_PANEL', ['file', null]);
+              loadFile(this, this.$store.state.Stat.fileName, 'stat')
+            } else {
+              this.$store.commit('STAT_SET_LEFT_PANEL', ['dimension', x]);
+            }
             break;
           }
           case 'server': {
-            getList(this, [this.$store.state.System.server, this.$store.state.System.port], this.$store.state.Stat.serverTable.tableName, x, this.$store.state.System.user.username)
+            if (x === '全部') {
+              this.$store.commit('STAT_SET_TABLE_TYPE', 'server');
+              this.$store.commit('STAT_SET_LEFT_PANEL', ['file', null]);
+              getStat(this, [this.$store.state.System.server, this.$store.state.System.port], { tableName: this.$store.state.Stat.serverTable.tableName, page: this.$store.state.Stat.tablePage, username: this.$store.state.System.user.username, type: this.$store.state.Stat.dimensionType, value: this.$store.state.Stat.dimensionServer })
+            } else {
+              getList(this, [this.$store.state.System.server, this.$store.state.System.port], this.$store.state.Stat.serverTable.tableName, x, this.$store.state.System.user.username)
+            }
             break;
           }
           default: {
