@@ -54,14 +54,14 @@
             <a id="stat-right-chart-pie-map" class="nav-link" href="#" v-on:click='showChart("chartRight", "饼图")'> 饼图 <span class="sr-only">(current)</span></a>
           </div>
         </li>
-        <li class="nav-item dropdown">
+        <li v-if="this.$store.state.Stat.tableType !== 'compare'" class="nav-item dropdown">
           <a class="nav-link dropdown-toggle text-light" href="#" id="stat-right-dimension" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             维度选择
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
             <a id="stat-right-dimension-org" class="nav-link" href="#" v-on:click='selX("机构")'> 机构 <span class="sr-only">(current)</span></a>
             <a id="stat-right-dimension-time" class="nav-link" href="#" v-on:click='selX("时间")'> 时间 <span class="sr-only">(current)</span></a>
-            <a id="stat-right-dimension-disease" class="nav-link" href="#" v-on:click='selX("病种")'> 病种 <span class="sr-only">(current)</span></a>
+            <a id="stat-right-dimension-disease" class="nav-link" href="#" v-on:click='selX("病种")' v-if="tableType === 'local'"> 病种 <span class="sr-only">(current)</span></a>
             <a id="stat-right-dimension-disease" class="nav-link" href="#" v-on:click='selX("全部")'> 全部 <span class="sr-only">(current)</span></a>
           </div>
         </li>
@@ -88,7 +88,8 @@
     data() {
       return {
         paths: [],
-        stat: ''
+        stat: '',
+        tableType: this.$store.state.Stat.tableType,
       };
     },
     methods: {
