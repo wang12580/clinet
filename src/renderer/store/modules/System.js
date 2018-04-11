@@ -52,7 +52,8 @@ const state = {
   orgPage: 'getOrg',
   userPower: null,
   persons: {},
-  pageInfo: { org: '1', department: '1' }
+  pageInfo: { org: '1', department: '1' },
+  targetList: []
 };
 
 const mutations = {
@@ -161,7 +162,10 @@ const mutations = {
   },
   // 读取本地wt4文件目录
   SYSTEM_LOAD_WT4_FILES() {
-    const files = fs.readdirSync(global.hitbdata.path.stat).filter(x => x.endsWith('.csv'))
+    const files = fs.readdirSync(global.hitbdata.path.stat).filter(x => x.endsWith('.csv') && (x.startsWith('test_wt4_') || x.startsWith('wt4_')))
+    console.log(files);
+    // const reg = /^$/
+    // fs.filter(x => )
     state.wt4Files = files;
   },
   // 读取本地wt4文件
@@ -220,6 +224,10 @@ const mutations = {
   SYSTEM_GET_TARGET(state, field) {
     state.targetIndex = field.index
     state.targetDimension = field.dimension
+  },
+  // 获取计算列表
+  SYSTEM_GET_TARGET_LIST(state, field) {
+    state.targetList = field
   },
   // 或计算数据
   SYSTEM_GET_SERVER_STAT(state, field) {
@@ -314,6 +322,7 @@ const actions = {
     commit('SYSTEM_GET_USERS');
     commit('SYSTEM_GET_PAGEINFO');
     commit('SYSTEM_SET_SEARCH');
+    commit('SYSTEM_GET_TARGET_LIST');
   },
 };
 
