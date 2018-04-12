@@ -85,6 +85,7 @@
   import chartRadar from '../../utils/ChartRadar';
   import chartBar from '../../utils/ChartBar';
   import chartPie from '../../utils/ChartPie';
+  import chartData from '../../utils/ChartData';
   import addContrast from '../../utils/StatContrast';
   import saveFile from '../../utils/SaveFile';
   import { getStatFiles, getStat, saveStat, getList, getStatWt4 } from '../../utils/StatServerFile';
@@ -127,25 +128,61 @@
         } else if ((this.$store.state.Stat.tablePage === this.$store.state.Stat.countPage && n === 1) || this.$store.state.Stat.countPage === 0) {
           this.$store.commit('SET_NOTICE', '当前已是尾页');
         } else {
+          let table = []
           switch (this.$store.state.Stat.tableType) {
             case 'server':
               this.$store.commit('STAT_TABLE_PAGE', n);
               getStat(this, [this.$store.state.System.server, this.$store.state.System.port], { tableName: this.$store.state.Stat.serverTable.tableName, page: this.$store.state.Stat.tablePage, username: this.$store.state.System.user.username, type: this.$store.state.Stat.dimensionType, value: this.$store.state.Stat.dimensionServer })
+              table = this.$store.state.Stat.serverTable.data
               break;
             case 'local':
               this.$store.commit('STAT_TABLE_PAGE', n);
               this.$store.commit('SET_NOTICE', `当前${this.$store.state.Stat.tablePage}页,共${this.$store.state.Stat.countPage}页`)
+              table = this.$store.state.Stat.localTable
               break;
             default:
               break;
           }
+          chartData(this, table, this.$store.state.Stat.selectedRow, this.$store.state.Stat.selectedCold)
+          switch (this.$store.state.Stat.chartLeft) {
+            case '柱状图':
+              chartBar('chartLeft', this.$store.state.Stat.chartData)
+              break;
+            case '折线图':
+              chartLine('chartLeft', this.$store.state.Stat.chartData)
+              break;
+            case '雷达图':
+              chartRadar('chartLeft', this.$store.state.Stat.chartData)
+              break;
+            case '散点图':
+              chartScatter('chartLeft', this.$store.state.Stat.chartData)
+              break;
+            case '饼图':
+              chartPie('chartLeft', this.$store.state.Stat.chartData)
+              break;
+            default: break;
+          }
+          switch (this.$store.state.Stat.chartRight) {
+            case '柱状图':
+              chartBar('chartRight', this.$store.state.Stat.chartData)
+              break;
+            case '折线图':
+              chartLine('chartRight', this.$store.state.Stat.chartData)
+              break;
+            case '雷达图':
+              chartRadar('chartRight', this.$store.state.Stat.chartData)
+              break;
+            case '散点图':
+              chartScatter('chartRight', this.$store.state.Stat.chartData)
+              break;
+            case '饼图':
+              chartPie('chartRight', this.$store.state.Stat.chartData)
+              break;
+            default: break;
+          }
         }
       },
       edit: function () {
-        // let f = []
-        // if (this.$store.state.Stat.isServer) {
-        //   f = this.$store.state.Stat.serverTable.data.filter(x => x !== undefined).map(x => x.join(','))
-        // }
         switch (this.$store.state.Stat.tableType) {
           case 'local':
             if (this.$store.state.Stat.fileIndex !== null) {
@@ -168,21 +205,29 @@
       selX: function (x) {
         switch (this.$store.state.Stat.tableType) {
           case 'local': {
-            if (x === '全部') {
-              this.$store.commit('STAT_SET_LEFT_PANEL', ['file', null]);
-              loadFile(this, this.$store.state.Stat.fileName, 'stat')
+            if (this.$store.state.Stat.localTable.length > 0) {
+              if (x === '全部') {
+                this.$store.commit('STAT_SET_LEFT_PANEL', ['file', null]);
+                loadFile(this, this.$store.state.Stat.fileName, 'stat')
+              } else {
+                this.$store.commit('STAT_SET_LEFT_PANEL', ['dimension', x]);
+              }
             } else {
-              this.$store.commit('STAT_SET_LEFT_PANEL', ['dimension', x]);
+              this.$store.commit('SET_NOTICE', '请选择文件');
             }
             break;
           }
           case 'server': {
-            if (x === '全部') {
-              this.$store.commit('STAT_SET_TABLE_TYPE', 'server');
-              this.$store.commit('STAT_SET_LEFT_PANEL', ['file', null]);
-              getStat(this, [this.$store.state.System.server, this.$store.state.System.port], { tableName: this.$store.state.Stat.serverTable.tableName, page: this.$store.state.Stat.tablePage, username: this.$store.state.System.user.username, type: this.$store.state.Stat.dimensionType, value: this.$store.state.Stat.dimensionServer })
+            if (this.$store.state.Stat.serverTable.data.length > 0) {
+              if (x === '全部') {
+                this.$store.commit('STAT_SET_TABLE_TYPE', 'server');
+                this.$store.commit('STAT_SET_LEFT_PANEL', ['file', null]);
+                getStat(this, [this.$store.state.System.server, this.$store.state.System.port], { tableName: this.$store.state.Stat.serverTable.tableName, page: this.$store.state.Stat.tablePage, username: this.$store.state.System.user.username, type: this.$store.state.Stat.dimensionType, value: this.$store.state.Stat.dimensionServer })
+              } else {
+                getList(this, [this.$store.state.System.server, this.$store.state.System.port], this.$store.state.Stat.serverTable.tableName, x, this.$store.state.System.user.username)
+              }
             } else {
-              getList(this, [this.$store.state.System.server, this.$store.state.System.port], this.$store.state.Stat.serverTable.tableName, x, this.$store.state.System.user.username)
+              this.$store.commit('SET_NOTICE', '请选择文件');
             }
             break;
           }
@@ -192,7 +237,10 @@
         }
       },
       showChart: function (id, type) {
-        const option = this.$store.state.Stat.chartData
+        let option = this.$store.state.Stat.chartData
+        if (option.length === 0) {
+          option = null
+        }
         if (id === 'chartRight') {
           this.$store.commit('STAT_SET_CHART_RIGHT', type);
           switch (type) {
