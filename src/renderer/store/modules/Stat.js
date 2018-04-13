@@ -35,7 +35,7 @@ const state = {
   chartLeft: '柱状图',
   chartRight: '折线图',
   tableType: 'local',
-  fileIndex: null,
+  fileIndex: { first: 0, second: 0, third: 0 },
   dimensionServer: '',
   isServer: false,
   fileName: null,
@@ -43,6 +43,9 @@ const state = {
   colNum: 0,
   titlePage: 0,
   compareTable1: [],
+  chartOption: '',
+  chartIsShow: true,
+  serverMenu: { first: [], second: [], third: [], type: '' },
 };
 
 const mutations = {
@@ -104,7 +107,6 @@ const mutations = {
       state.dimensionType = opt[1];
       switch (opt[1]) {
         case '机构':
-          console.log(state.dimensionOrg);
           state.dimension = state.dimensionOrg
           break;
         case '时间':
@@ -157,8 +159,6 @@ const mutations = {
     }
     state.localTable = state.localTables[state.tablePage]
   },
-  // STAT_SET_CHART_OPTION(state, opt) {
-  // },
   STAT_GET_FIELD(state, field) {
     state.field = field;
   },
@@ -202,7 +202,6 @@ const mutations = {
       })
       state.compareTable1.push(f)
     })
-    console.log(state.compareTable1)
   },
   STAT_SET_SERVER_TABLE(state, opt) {
     state.isServer = true
@@ -227,8 +226,21 @@ const mutations = {
   STAT_SET_CHART_DATA(state, data) {
     state.chartData = data
   },
-  STAT_SET_FILE_INDEX(state, index) {
-    state.fileIndex = index
+  STAT_SET_FILE_INDEX(state, value) {
+    state.fileIndex = []
+    switch (value[0]) {
+      case 'first':
+        state.fileIndex.first = value[1]
+        break;
+      case 'second':
+        state.fileIndex.second = value[1]
+        break;
+      case 'third':
+        state.fileIndex.third = value[1]
+        break;
+      default:
+        break;
+    }
   },
   STAT_TABLE_NAME(state, index) {
     state.tableName = index
@@ -257,8 +269,31 @@ const mutations = {
     state.colNum = num
   },
   STAT_SET_TITLE_PAGE(state, num) {
-    console.log(num)
     state.colNum = num
+  },
+  STAT_SET_CHART_OPTION(state, opt) {
+    state.chartOption = opt
+  },
+  STAT_SET_CHART_IS_SHOW(state, value) {
+    state.chartIsShow = value
+  },
+  STAT_SET_SERVER_MENU(state, opt) {
+    const type = opt[0]
+    const opt2 = opt[1]
+    switch (type) {
+      case '一级菜单':
+        state.serverMenu.first = opt2
+        break;
+      case '二级菜单':
+        state.serverMenu.second = opt2
+        break;
+      case '三级菜单':
+        state.serverMenu.third = opt2
+        break;
+      default:
+        break;
+    }
+    state.serverMenu.type = type
   },
   // STAT_TABLE_PAGE(state, n) {
   //   if (state.tableType === 'server' && n === 0) {
@@ -298,6 +333,8 @@ const actions = {
     commit('STAT_SET_COUNT_PAGE');
     commit('STAT_SET_COL_NUM');
     commit('STAT_SET_TITLE_PAGE');
+    commit('STAT_SET_CHART_IS_SHOW');
+    commit('STAT_SET_SERVER_MENU');
   },
 };
 export default {
