@@ -190,9 +190,14 @@
     methods: {
       onClickTd: function (data, index) {
         const header = this.$store.state.Stat.serverTable.data[0]
-        const cindex = header.indexOf('病历数')
-        const oindex = header.indexOf('机构')
-        const tindex = header.indexOf('时间')
+        let cindex = 0
+        let oindex = 0
+        let tindex = 0
+        if (this.$store.state.Stat.tableType === 'server') {
+          cindex = header.indexOf('病历数')
+          oindex = header.indexOf('机构')
+          tindex = header.indexOf('时间')
+        }
         if (index !== undefined) {
           this.$store.commit('STAT_SET_CHART_IS_SHOW', true);
           const value = this.$store.state.Stat.tableSel.map((x) => {
@@ -226,15 +231,6 @@
                 getStatWt4(this, [this.$store.state.System.server, this.$store.state.System.port], org, time, drg)
               }
               break;
-            // case 'case':
-            //   if (value.includes(true)) {
-            //     if (data[0] === 'org' && data[1] === 'time') {
-            //       this.$store.commit('STAT_SET_COL', index);
-            //     }
-            //   } else {
-            //     this.$store.commit('SET_NOTICE', '无数据,无法选中当前列!');
-            //   }
-            //   break;
             default:
           }
         }
@@ -247,6 +243,8 @@
         }
         this.$store.commit('STAT_SET_CHART_IS_SHOW', true);
         const id = 'chartLeft'
+        console.log(document.getElementById('chartLeft'))
+        console.log(id)
         const type = this.$store.state.Stat.chartLeft
         let table = []
         if (this.$store.state.Stat.tableType === 'local') {
@@ -306,7 +304,7 @@
       },
       serverPage: function (data) {
         this.$store.commit('STAT_SET_TABLE_PAGE', parseInt(data, 10))
-        getStat(this, [this.$store.state.System.server, this.$store.state.System.port], { tableName: this.$store.state.Stat.serverTable.tableName, page: parseInt(data, 10), username: this.$store.state.System.user.username, type: this.$store.state.Stat.dimensionType, value: this.$store.state.Stat.dimensionServer })
+        getStat(this, [this.$store.state.System.server, this.$store.state.System.port], { tableName: this.$store.state.Stat.serverTable.tableName, page: parseInt(data, 10), username: this.$store.state.System.user.username, type: this.$store.state.Stat.dimensionType, value: this.$store.state.Stat.dimensionServer }, 'stat')
       },
       chart: function (data) {
         this.$store.commit('STAT_SET_CHART_OPTION', data)
@@ -327,7 +325,7 @@
           this.$store.commit('STAT_SET_TABLE_TYPE', 'server')
           if (data.endsWith('.csv')) {
             // this.$store.commit('STAT_SET_CHART_IS_SHOW', true);
-            getStat(this, [this.$store.state.System.server, this.$store.state.System.port], { tableName: data, page: 1, username: this.$store.state.System.user.username, type: this.$store.state.Stat.dimensionType, value: this.$store.state.Stat.dimensionServer })
+            getStat(this, [this.$store.state.System.server, this.$store.state.System.port], { tableName: data, page: 1, username: this.$store.state.System.user.username, type: this.$store.state.Stat.dimensionType, value: this.$store.state.Stat.dimensionServer }, 'stat')
           } else {
             getStatFiles(this, [this.$store.state.System.server, this.$store.state.System.port], data, this.$store.state.System.user.username)
           }

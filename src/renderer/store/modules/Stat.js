@@ -210,7 +210,7 @@ const mutations = {
   },
   STAT_SET_TABLE_TYPE(state, data) {
     if (data !== 'compare') {
-      if (data === 'server') {
+      if (data === 'server' || data === 'case') {
         state.isServer = true
       } else {
         state.isServer = false
@@ -243,7 +243,7 @@ const mutations = {
           break;
       }
     } else {
-      state.fileIndex = value[1]
+      state.fileIndex.first = value[1]
     }
   },
   STAT_TABLE_NAME(state, index) {
