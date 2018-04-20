@@ -1,7 +1,7 @@
 <template>
   <div>
     <right-bar></right-bar>
-    <div class="row" v-if="this.$store.state.Stat.chartIsShow === true">
+    <div class="row" v-show="this.$store.state.Stat.chartIsShow === 'chart'">
       <div class="col">
         <left-panel></left-panel>
       </div>
@@ -20,7 +20,7 @@
         </div>
       </div>
     </div>
-    <div class="row" v-if="this.$store.state.Stat.chartIsShow === false">
+    <div class="row" v-show="this.$store.state.Stat.chartIsShow === 'menu'">
       <div class="col">
         <left-panel></left-panel>
       </div>
@@ -53,6 +53,24 @@
         </div>
       </div>
     </div>
+    <div class="row" v-show="this.$store.state.Stat.chartIsShow === 'dimension'">
+      <div class="col">
+        <left-panel></left-panel>
+      </div>
+      <div class="col">
+        <form style="margin-top: 20px">
+          <div class="form-group">
+            <label for="exampleInputEmail1">维度选择：</label>
+            <input type="text" class="form-control" placeholder="">
+          </div>
+          <button type="submit" class="btn btn-primary">查询</button>
+        </form>
+      </div>
+      <div class="col">
+      </div>
+      <div class="col">
+      </div>
+    </div>
     <table>
       <tr v-for="(data, index) in xs" v-bind:key='index' v-on:click="onClick(data, index)" class="stat-right-table-tr" v-bind:class="{'table-danger':flag.find((n)=>n===index)}">
         <td v-for="(field, index) in data" v-bind:key='index' v-bind:class="{'table-danger':flagTd.find((n)=>n===index)}" v-on:click="onClickTd(data, index)" class="stat-right-table-td"  v-if="index < 20">{{data[index]}}</td>
@@ -83,9 +101,6 @@
     components: { RightBar, LeftPanel },
     data() {
       return {
-        // flag: [],
-        // flagTd: [],
-        // table: false
       };
     },
     computed: {
@@ -143,7 +158,6 @@
               break;
             }
           }
-          // this.table = table
           return table
         }
       },
@@ -151,8 +165,6 @@
         get() {
           let f = []
           if (this.$store.state.Stat.tableType === 'compare') {
-            f = []
-          } else if (this.$store.state.Stat.tableType === 'case') {
             f = []
           } else {
             f = this.$store.state.Stat.selectedRow
@@ -199,7 +211,7 @@
           tindex = header.indexOf('时间')
         }
         if (index !== undefined) {
-          this.$store.commit('STAT_SET_CHART_IS_SHOW', true);
+          this.$store.commit('STAT_SET_CHART_IS_SHOW', 'chart');
           const value = this.$store.state.Stat.tableSel.map((x) => {
             let isType = false
             if (x[index] === '-' || x[index] === '') {
@@ -225,7 +237,12 @@
               }
               if (index === cindex && data !== this.$store.state.Stat.serverTable.data[0]) {
                 this.$store.commit('STAT_SET_TABLE_TYPE', 'case');
-                const org = data[oindex]
+                let org = ''
+                if (data[oindex] === '全部机构') {
+                  org = ''
+                } else {
+                  org = data[oindex]
+                }
                 const time = data[tindex]
                 const drg = ''
                 getStatWt4(this, [this.$store.state.System.server, this.$store.state.System.port], org, time, drg)
@@ -237,14 +254,13 @@
       },
       onClick: function (data, index) {
         if (index !== undefined) {
+          this.flag = index
           this.$store.commit('STAT_SET_ROW', index);
           this.$store.commit('STAT_GET_FIELD', data);
           this.$store.commit('STAT_GET_FIELD_INDEX', index);
         }
-        this.$store.commit('STAT_SET_CHART_IS_SHOW', true);
+        this.$store.commit('STAT_SET_CHART_IS_SHOW', 'chart');
         const id = 'chartLeft'
-        console.log(document.getElementById('chartLeft'))
-        console.log(id)
         const type = this.$store.state.Stat.chartLeft
         let table = []
         if (this.$store.state.Stat.tableType === 'local') {
@@ -318,13 +334,15 @@
         this.$store.commit('STAT_SET_FILE_NAME', data);
         this.$store.commit('STAT_SET_FILE_INDEX', index);
         // 图表
-        // chartBar('chartLeft', null)
-        // chartLine('chartRight', null)
+        if (index[0] === 'third') {
+          this.$store.commit('STAT_SET_CHART_IS_SHOW', 'chart');
+          chartBar('chartLeft', null)
+          chartLine('chartRight', null)
+        }
         this.$store.commit('STAT_SET_TABLE_PAGE', 1)
         if (this.$store.state.Stat.isServer) {
           this.$store.commit('STAT_SET_TABLE_TYPE', 'server')
           if (data.endsWith('.csv')) {
-            // this.$store.commit('STAT_SET_CHART_IS_SHOW', true);
             getStat(this, [this.$store.state.System.server, this.$store.state.System.port], { tableName: data, page: 1, username: this.$store.state.System.user.username, type: this.$store.state.Stat.dimensionType, value: this.$store.state.Stat.dimensionServer }, 'stat')
           } else {
             getStatFiles(this, [this.$store.state.System.server, this.$store.state.System.port], data, this.$store.state.System.user.username)

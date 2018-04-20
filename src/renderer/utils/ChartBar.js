@@ -13,7 +13,6 @@ export default function chartBar(id, opt = null) {
       type: 'bar'
     }]
   }
-
   const myChart = echarts.init(document.getElementById(id), 'light');
   if (opt) {
     // 取得表头并删除前两位
