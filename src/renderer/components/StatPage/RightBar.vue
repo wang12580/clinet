@@ -77,8 +77,7 @@
             <!-- <a id="stat-right-dimension-org" class="nav-link" href="#" v-on:click='selX("机构")'> 机构 <span class="sr-only">(current)</span></a>
             <a id="stat-right-dimension-time" class="nav-link" href="#" v-on:click='selX("时间")'> 时间 <span class="sr-only">(current)</span></a>
             <a id="stat-right-dimension-disease" class="nav-link" href="#" v-on:click='selX("病种")' v-if="tableType === 'local'"> 病种 <span class="sr-only">(current)</span></a>
-            <a id="stat-right-dimension-disease" class="nav-link" href="#" v-on:click='selX("全部")'> 全部 <span class="sr-only">(current)</span></a>
-            <a id="stat-right-dimension-disease" class="nav-link" href="#" v-on:click='selX("全部")'> 自定义维度 <span class="sr-only">(current)</span></a> -->
+            <a id="stat-right-dimension-disease" class="nav-link" href="#" v-on:click='selX("全部")'> 全部 <span class="sr-only">(current)</span></a> -->
             <a id="stat-right-dimension-org" v-for="(data, index) in dimensionSel" v-bind:key='index' class="nav-link" href="#" v-on:click='selX(index)'> {{data}} <span class="sr-only">(current)</span></a>
           </div>
         </li>
@@ -149,6 +148,7 @@
           getStatFiles(this, [this.$store.state.System.server, this.$store.state.System.port], '', this.$store.state.System.user.username)
         }
       },
+
       page: function (n) {
         if (this.$store.state.Stat.tablePage === 1 && n === -1) {
           this.$store.commit('SET_NOTICE', '当前已是第一页')
