@@ -78,14 +78,17 @@
             <a id="stat-right-dimension-time" class="nav-link" href="#" v-on:click='selX("时间")'> 时间 <span class="sr-only">(current)</span></a>
             <a id="stat-right-dimension-disease" class="nav-link" href="#" v-on:click='selX("病种")' v-if="tableType === 'local'"> 病种 <span class="sr-only">(current)</span></a>
             <a id="stat-right-dimension-disease" class="nav-link" href="#" v-on:click='selX("全部")'> 全部 <span class="sr-only">(current)</span></a> -->
-            <a id="stat-right-dimension-org" v-for="(data, index) in dimensionSel" v-bind:key='index' class="nav-link" href="#" v-on:click='selX(index)'> {{data}} <span class="sr-only">(current)</span></a>
+            <a v-for="(data, index) in dimensionSel" v-bind:key='index' class="nav-link" href="#" v-on:click='selX(index)' v-bind:id="'stat-td-tr'+index" > {{data}} <span class="sr-only">(current)</span></a>
           </div>
         </li>
-        <li class="nav-item active" id="stat-prev-page" v-on:click='title(-1)' v-if="this.$store.state.Stat.colNum > 10">
+        <li class="nav-item active" id="stat-prev-page" v-on:click='title(-10)' v-if="this.$store.state.Stat.haveRight">
           <a class="nav-link text-light" href="#"> 左页 <span class="sr-only">(current)</span></a>
         </li>
-        <li class="nav-item active" id="stat-next-page" v-on:click='title(1)' v-if="this.$store.state.Stat.colNum > 10">
+        <li class="nav-item active" id="stat-next-page" v-on:click='title(10)' v-if="this.$store.state.Stat.haveRight">
           <a class="nav-link text-light" href="#"> 右页 <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item active" id="stat-edit-data" v-on:click='edit'>
+          <a class="nav-link text-light" href="#"> 详情 <span class="sr-only">(current)</span></a>
         </li>
       </ul>
       <form class="form-inline my-2 my-lg-0" v-on:submit.prevent>
@@ -124,6 +127,11 @@
       file: {
         get() {
           return this.$store.state.Stat.file
+        }
+      },
+      selectedCol: {
+        get() {
+          return this.$store.state.Stat.selectedCol
         }
       }
     },
@@ -223,6 +231,7 @@
             this.$store.commit('EDIT_SET_LEFT_PANEL', 'table');
             this.$store.commit('EDIT_SET_RIGHT_PANEL', 'server');
             this.$store.commit('EDIT_SET_FILES_INDEX', 0);
+            this.$store.commit('EDIT_LOAD_FILE', this.$store.state.Stat.serverTable.data);
             break;
           default:
         }
@@ -235,17 +244,28 @@
         switch (this.$store.state.Stat.tableType) {
           case 'local': {
             if (this.$store.state.Stat.localTable.length > 0) {
+              // let x1 = ''
+              // if (this.dimensionSel[x] === '时间') {
+              //   x1 = 'time'
+              // } else if (this.dimensionSel[x] === '机构') {
+              //   x1 = 'org'
+              // } else {
+              //   x1 = 'drg2'
+              // }
               if (this.dimensionSel[x] === '全部') {
                 this.$store.commit('STAT_SET_LEFT_PANEL', ['file', null]);
                 loadFile(this, this.$store.state.Stat.fileName, 'stat')
               } else if (this.dimensionSel[x] === '自定义维度') {
-                const header = this.file[0].split(',')
-                const col = this.$store.state.Stat.selectedCol
-                col.map(x => this.$store.commit('STAT_SET_DIMENSION_SEL', header[x]));
+                if (this.selectedCol.length > 0) {
+                  this.$store.commit('STAT_SET_CHART_IS_SHOW', 'dimension');
+                } else {
+                  this.$store.commit('SET_NOTICE', '请选择维度！')
+                }
+                // const header = this.file[0].split(',')
+                // const col = this.$store.state.Stat.selectedCol
+                // col.map(x => this.$store.commit('STAT_SET_DIMENSION_SEL', header[x]));
               } else if (this.dimensionSel[x] === '时间' || this.dimensionSel[x] === '机构' || this.dimensionSel[x] === '病种') {
-                this.$store.commit('STAT_SET_LEFT_PANEL', ['dimension', x]);
-              } else {
-                this.$store.commit('STAT_SET_CHART_IS_SHOW', 'dimension');
+                this.$store.commit('STAT_SET_LEFT_PANEL', ['dimension', this.dimensionSel[x]]);
               }
             } else {
               this.$store.commit('SET_NOTICE', '请选择文件');
@@ -390,10 +410,16 @@
       title: function (n) {
         switch (this.$store.state.Stat.tableType) {
           case 'server':
-            this.$store.commit('STAT_SET_TITLE_PAGE', n);
+            // this.$store.commit('STAT_SET_TITLE_PAGE', n);
             break;
           case 'local':
-            this.$store.commit('STAT_SET_TITLE_PAGE', n);
+            if (n > 0 && this.$store.state.Stat.colNum + n <= this.$store.state.Stat.tableHeader[0].length) {
+              this.$store.commit('STAT_SET_COL_NUM', this.$store.state.Stat.colNum + n);
+            } else if (n < 0 && this.$store.state.Stat.colNum + n > 0) {
+              this.$store.commit('STAT_SET_COL_NUM', this.$store.state.Stat.colNum + n);
+            } else {
+              this.$store.commit('SET_NOTICE', '超出范围');
+            }
             break;
           default:
             break;

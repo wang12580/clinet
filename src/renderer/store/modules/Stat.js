@@ -15,6 +15,7 @@ const state = {
   rightLine: null,
   rightRadar: null,
   rightScatter: null,
+  dimension: null,
   dimensionSel: ['时间', '机构', '病种', '全部', '自定义维度'],
   dimensionType: null,
   dimensionOrg: [],
@@ -32,6 +33,8 @@ const state = {
   localTables: {},
   localTable: [],
   chartData: [],
+  haveRight: false,
+  colNum: 10,
   chartLeft: '柱状图',
   chartRight: '折线图',
   tableType: 'local',
@@ -40,13 +43,14 @@ const state = {
   isServer: false,
   fileName: null,
   countPage: 0,
-  colNum: 0,
   titlePage: 0,
   compareTable1: [],
   chartOption: '',
   chartIsShow: 'chart',
   serverMenu: { first: [], second: [], third: [], type: '' },
-  caseTable: { page: 1, countPage: 0, data: [], pageList: [], tableName: '' }
+  caseTable: { page: 1, countPage: 0, data: [], pageList: [], tableName: '' },
+  caseSelectedRow: [],
+  caseSelectedCol: []
 };
 
 const mutations = {
@@ -84,6 +88,16 @@ const mutations = {
       state.localTables[i] = f
     }
     state.localTable = state.localTables[state.tablePage]
+    if (state.tableHeader[0].length > 10) {
+      state.haveRight = true
+      state.colNum = 10
+      const table = []
+      const indexs = [...Array(10)].map((v, k) => k)
+      state.localTable.forEach((xs) => {
+        table.push(indexs.map(x => xs[x]))
+      })
+      state.localTable = table
+    }
   },
   STAT_TABLE_PAGE(state, n) {
     if (state.tableType === 'server' && n === 0) {
@@ -205,6 +219,7 @@ const mutations = {
     })
   },
   STAT_SET_SERVER_TABLE(state, opt) {
+    console.log(opt)
     state.isServer = true
     state.serverTable = opt
   },
@@ -271,10 +286,19 @@ const mutations = {
   },
   STAT_SET_COL_NUM(state, num) {
     state.colNum = num
+    const indexs = []
+    // const rangeArray = (start, end) => Array(end - start + 1).map((v, i) => i + start)
+    for (let i = num - 10; i < num; i += 1) { indexs.push(i) }
+    state.haveRight = true
+    const table = []
+    state.localTables[state.tablePage].forEach((xs) => {
+      table.push(indexs.map(x => xs[x]))
+    })
+    state.localTable = table
   },
-  STAT_SET_TITLE_PAGE(state, num) {
-    state.colNum = num
-  },
+  // STAT_SET_TITLE_PAGE(state, num) {
+  //   state.colNum = num
+  // },
   STAT_SET_CHART_OPTION(state, opt) {
     state.chartIsShow = 'chart'
     state.chartOption = opt
@@ -288,6 +312,7 @@ const mutations = {
     switch (type) {
       case '一级菜单':
         state.serverMenu.first = opt2
+        state.serverMenu.first.push('病案数据')
         break;
       case '二级菜单':
         state.serverMenu.second = opt2
@@ -307,6 +332,38 @@ const mutations = {
     const index = state.dimensionSel.indexOf(value)
     if (index === -1) {
       state.dimensionSel.push(value)
+    }
+  },
+  STAT_SET_CASE_ROW(state, index) {
+    const x = state.caseSelectedRow.indexOf(index)
+    if (x === -1) {
+      state.caseSelectedRow.push(index)
+    } else {
+      state.caseSelectedRow.splice(x, 1)
+    }
+  },
+  STAT_SET_CASE_COL(state, index) {
+    const x = state.caseSelectedCol.indexOf(index)
+    if (x === -1) {
+      state.caseSelectedCol.push(index)
+    } else {
+      state.caseSelectedCol.splice(x, 1)
+    }
+  },
+  STAT_SET_CASE_FLAG(state) {
+    state.caseSelectedRow = []
+    state.caseSelectedCol = []
+  },
+  STAT_SET_TABLE(state, value) {
+    switch (value[0]) {
+      case 'local':
+        state.localTable = value[1]
+        break;
+      case 'server':
+        state.serverTable = value[1]
+        break;
+      default:
+        break;
     }
   }
 };
@@ -343,6 +400,10 @@ const actions = {
     commit('STAT_SET_SERVER_MENU');
     commit('STAT_SET_CASE_TABLE');
     commit('STAT_SET_DIMENSION_SEL');
+    commit('STAT_SET_CASE_ROW');
+    commit('STAT_SET_CASE_COL');
+    commit('STAT_SET_CASE_FLAG');
+    commit('STAT_SET_TABLE');
   },
 };
 export default {

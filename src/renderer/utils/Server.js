@@ -315,7 +315,30 @@ export function sGetWt4(obj, data) {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
     responseType: 'json'
   }).then((res) => {
-    if (res.status === 200) {
+    if (data[3] === 'stat') {
+      if (res.status === 200) {
+        const keys = Object.keys(res.data.data[0])
+        const newWt4 = []
+        newWt4.push(keys)
+        res.data.data.forEach((x) => {
+          newWt4.push(keys.map((k) => {
+            let a = []
+            if (typeof (x[k]) === 'object') {
+              if (x[k] !== null) {
+                a = x[k].join(',')
+              } else {
+                a = ''
+              }
+            } else {
+              a = x[k]
+            }
+            return a
+          }))
+        })
+        res.data.data = newWt4
+        obj.$store.commit('STAT_SET_SERVER_TABLE', res.data)
+      }
+    } else if (res.status === 200) {
       obj.$store.commit('SYSTEM_SET_WT4', [res.data, '病案查询成功', true])
     } else {
       obj.$store.commit('SYSTEM_SET_WT4', [{}, '病案查询失败', false])

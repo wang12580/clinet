@@ -54,28 +54,28 @@
       </div>
     </div>
     <div class="row" v-show="this.$store.state.Stat.chartIsShow === 'dimension'">
-      <div class="col">
+      <div class="col" style="max-width:400px">
         <left-panel></left-panel>
       </div>
-      <div class="col">
-        <form style="margin-top: 20px">
+      <div class="col" style="max-width:400px" v-for="(data, index) in header" v-bind:key='index'>
+        <form style="margin-top: 20px" v-on:submit.prevent>
           <div class="form-group">
-            <label for="exampleInputEmail1">维度选择：</label>
-            <input type="text" class="form-control" placeholder="">
+            <label for="exampleInputEmail1">维度选择：{{data}}</label>
+            ><input type="text" class="form-control" placeholder="" v-model="svalue">
+            <input type="text" class="form-control" placeholder="" v-model="bvalue">
           </div>
-          <button type="submit" class="btn btn-primary">查询</button>
+          <button type="submit" class="btn btn-primary" v-on:click="selX(data)">查询</button>
+          <button type="submit" class="btn btn-primary" v-on:click="selX">清空</button>
         </form>
       </div>
-      <div class="col">
-      </div>
-      <div class="col">
-      </div>
     </div>
-    <table>
-      <tr v-for="(data, index) in xs" v-bind:key='index' v-on:click="onClick(data, index)" class="stat-right-table-tr" v-bind:class="{'table-danger':flag.find((n)=>n===index)}">
-        <td v-for="(field, index) in data" v-bind:key='index' v-bind:class="{'table-danger':flagTd.find((n)=>n===index)}" v-on:click="onClickTd(data, index)" class="stat-right-table-td"  v-if="index < 10">{{data[index]}}</td>
-      </tr>
-    </table>
+    <div>
+      <table>
+        <tr v-for="(data, index) in xs" v-bind:key='index' v-on:click="onClick(data, index)" class="stat-right-table-tr" v-bind:class="{'table-danger':flag.find((n)=>n===index)}">
+          <td v-for="(field, index) in data"  v-bind:key='index' v-bind:class="{'table-danger':flagTd.find((n)=>n===index)}" v-on:click="onClickTd(data, index)" class="stat-right-table-td"  v-if="index < 10">{{data[index]}}</td>
+        </tr>
+      </table>
+    </div>
     <nav aria-label="Page navigation example" v-if="this.$store.state.Stat.tableType === 'server'">
       <ul class="pagination">
         <li class="page-item" v-for= "(value, index) in page.pageList" v-bind:key="index" v-bind:class="{'disabled':value.page == page.page}" v-on:click="serverPage(value.page)"><a class="page-link" href="#">
@@ -101,6 +101,8 @@
     components: { RightBar, LeftPanel },
     data() {
       return {
+        bvalue: '',
+        svalue: ''
       };
     },
     computed: {
@@ -158,6 +160,19 @@
               break;
             }
           }
+          // if (['local', 'server'].includes(this.$store.state.Stat.tableType)) {
+          //   const header = this.$store.state.Stat.localTable[0];
+          //   console.log(this.$store.state.Stat.localTable)
+          //   const a = []
+          //   console.log(header)
+          //   if (header.length > 10) {
+          //     const indexs = [...Array(10)].map((v, k) => k)
+          //     table.forEach((xs) => {
+          //       a.push(indexs.map(x => xs[x]))
+          //     })
+          //   }
+          //   table = a;
+          // }
           return table
         }
       },
@@ -166,6 +181,8 @@
           let f = []
           if (this.$store.state.Stat.tableType === 'compare') {
             f = []
+          } else if (this.$store.state.Stat.tableType === 'case') {
+            f = this.$store.state.Stat.caseSelectedRow
           } else {
             f = this.$store.state.Stat.selectedRow
           }
@@ -179,7 +196,7 @@
           if (this.$store.state.Stat.tableType === 'compare') {
             f = []
           } else if (this.$store.state.Stat.tableType === 'case') {
-            f = []
+            f = this.$store.state.Stat.caseSelectedCol
           } else {
             f = this.$store.state.Stat.selectedCol
           }
@@ -191,6 +208,36 @@
         get() {
           return { pageList: this.$store.state.Stat.serverTable.pageList, page: this.$store.state.Stat.serverTable.page }
         }
+      },
+      header: {
+        get() {
+          let f = []
+          let col = []
+          const name = []
+          let table = ''
+          if (this.$store.state.Stat.tableType === 'compare') {
+            f = []
+          } else if (this.$store.state.Stat.tableType === 'case') {
+            table = this.$store.state.Stat.caseTable
+            col = this.$store.state.Stat.caseSelectedCol
+          } else if (this.$store.state.Stat.tableType === 'local') {
+            table = this.$store.state.Stat.localTable
+            col = this.$store.state.Stat.selectedCol
+          } else if (this.$store.state.Stat.tableType === 'server') {
+            table = this.$store.state.Stat.serverTable
+            col = this.$store.state.Stat.selectedCol
+          }
+          col.map((x) => {
+            if (table.length > 0) {
+              name.push(table[0][x])
+            } else if (table.length === undefined) {
+              name.push(table.data[0][x])
+            }
+            return name
+          })
+          f = name
+          return f
+        },
       }
     },
     mounted: function () {
@@ -249,6 +296,11 @@
                 getStatWt4(this, [this.$store.state.System.server, this.$store.state.System.port], org, time, drg)
               }
               break;
+            case 'case':
+              if (data[0] === '病案ID' && data[1] === '主要诊断') {
+                this.$store.commit('STAT_SET_CASE_COL', index);
+              }
+              break;
             default:
           }
         }
@@ -269,6 +321,7 @@
         } else if (this.$store.state.Stat.tableType === 'server') {
           table = this.$store.state.Stat.serverTable.data
         } else if (this.$store.state.Stat.tableType === 'case') {
+          this.$store.commit('STAT_SET_CASE_ROW', index);
           table = this.$store.state.Stat.caseTable.data
         } else {
           table = this.$store.state.Stat.compareTable
@@ -351,6 +404,32 @@
         } else {
           loadFile(this, data, 'stat')
           this.$store.commit('STAT_SET_TABLE_TYPE', 'local');
+        }
+      },
+      selX: function (data) {
+        let tableType = ''
+        let table = []
+        const table1 = []
+        let header = []
+        switch (this.$store.state.Stat.tableType) {
+          case 'local':
+            table = this.$store.state.Stat.localTable
+            header = table.shift()
+            tableType = 'local'
+            break;
+          default:
+            break;
+        }
+        const index = header.indexOf(data)
+        if (index > -1) {
+          table.map((x) => {
+            if (x[index] < this.bvalue && x[index] > this.svalue) {
+              table1.push(x)
+            }
+            return table1
+          })
+          table1.splice(0, 0, header)
+          this.$store.commit('STAT_SET_TABLE', [tableType, table1]);
         }
       },
     },
