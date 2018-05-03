@@ -35,7 +35,7 @@
               f = this.$store.state.System.table
               break;
             case 'checkTable':
-              f = this.$store.state.System.table
+              f = this.$store.state.System.checkData
               break;
             case 'loadTable':
               // f = this.$store.state.System.table

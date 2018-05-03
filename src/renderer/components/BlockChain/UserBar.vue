@@ -55,13 +55,13 @@
       transaction: function () {
         this.$store.commit('BLOCK_SET_TOOLBAR', 'transaction');
         this.$store.commit('SET_NOTICE', '转账交易');
-        const ip = this.$store.state.System.server
+        const ip = '127.0.0.1'
         const port = 4000
         const username = this.$store.state.Block.account.username
         getAccountsPublicKey(this, [ip, port, username])
       },
       transRecord: function () {
-        const ip = this.$store.state.System.server
+        const ip = '127.0.0.1'
         const port = 4000
         const user = global.hitbdata.blockchain_user
         // console.log(ip)

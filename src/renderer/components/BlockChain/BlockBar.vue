@@ -39,7 +39,7 @@
     },
     methods: {
       blockList: function () {
-        const ip = this.$store.state.System.server
+        const ip = '127.0.0.1'
         const port = 4000
         // blocks(this, [ip, port]);
         bcBlockchain(this, [ip, port, 1]);

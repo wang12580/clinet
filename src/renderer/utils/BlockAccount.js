@@ -59,9 +59,10 @@ const qs = require('qs');
 // }
 export function open(obj, data) {
   console.log(data);
+  const urls = 'http://127.0.0.1:4000/api/open/'
   axios({
     method: 'post',
-    url: `http://${data[0]}:${data[1]}/api/open/`,
+    url: urls,
     data: qs.stringify({ username: data[2] }),
     headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
     responseType: 'json'
@@ -102,11 +103,11 @@ export function open(obj, data) {
 export function open3(obj, data) {
   console.log(data);
   const serverIp = '127.0.0.1'
-  const serverPort = '80'
+  const serverPort = '4000'
   console.log(`http://${serverIp}:${serverPort}/block/blockchain/`)
   axios({
     method: 'post',
-    url: `http://${data[0]}:${data[1]}/api/accounts/open/`,
+    url: 'http://127.0.0.1:4000/api/accounts/open/',
     data: { secret: data[2] },
     headers: { 'Content-Type': 'application/json' },
     responseType: 'json'
@@ -126,7 +127,8 @@ export function open3(obj, data) {
 
 // 根据地址获取账户信息
 export function accounts(obj, data) {
-  axios.get(`http://${data[0]}:${data[1]}/api/accounts?address=${data[2]}`)
+  console.log(data)
+  axios.get(`http://127.0.0.1:4000/api/accounts?address=${data[2]}`)
     .then((res) => {
       console.log(res)
       if (res.status === 200) {
@@ -140,7 +142,7 @@ export function accounts(obj, data) {
 
 // 获取账户余额
 export function getBalance(obj, data) {
-  axios.get(`http://${data[0]}:${data[1]}/api/accounts/getBalance?address=${data[2]}`)
+  axios.get(`http://127.0.0.1:4000/api/accounts/getBalance?address=${data[2]}`)
     .then((res) => {
       console.log(res)
       if (res.status === 200) {
@@ -154,7 +156,7 @@ export function getBalance(obj, data) {
 
 // 根据地址获取账户公钥
 export function getPublickey(obj, data) {
-  axios.get(`http://${data[0]}:${data[1]}/api/accounts/getPublickey?address=${data[2]}`)
+  axios.get(`http://127.0.0.1:4000/api/accounts/getPublickey?address=${data[2]}`)
     .then((res) => {
       console.log(res)
       if (res.status === 200) {
@@ -184,7 +186,7 @@ export function getPublickey(obj, data) {
 
 // 根据地址获取其投票列表
 export function delegatesAddress(obj, data) {
-  axios.get(`http://${data[0]}:${data[1]}/api/accounts/delegates?address=${data[2]}`)
+  axios.get(`http://127.0.0.1:4000/api/accounts/delegates?address=${data[2]}`)
     .then((res) => {
       console.log(res)
       if (res.status === 200) {
@@ -198,7 +200,8 @@ export function delegatesAddress(obj, data) {
 
 // 获取受托人手续费设置
 export function delegatesFee(obj, data) {
-  axios.get(`http://${data[0]}:${data[1]}/api/accounts/delegates/fee`)
+  console.log(data)
+  axios.get('http://127.0.0.1:4000/api/accounts/delegates/fee')
     .then((res) => {
       console.log(res)
       if (res.status === 200) {
@@ -369,9 +372,10 @@ export function multisignaturesAccounts(obj, data) {
 }
 // 获取用户地址
 export function getAccountsPublicKey(obj, data) {
+  console.log(data)
   axios({
     method: 'get',
-    url: `http://${data[0]}:${data[1]}/api/getAccountsPublicKey?username=${data[2]}`,
+    url: `http://${data[0]}:${data[1]}/api/getAccountsPublicKey`,
     responseType: 'json'
   }).then((res) => {
     if (res.status === 200) {
