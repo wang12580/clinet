@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" v-if="hasData">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
     <a class="navbar-brand" href="#" v-on:click="onClick('首页')" id="navbar-home">&nbsp;&nbsp;&nbsp;&nbsp;HITB-clinet&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -80,11 +80,6 @@
       };
     },
     computed: {
-      hasData: {
-        get() {
-          return this.$store.state.Home.hasData
-        }
-      },
       userName: {
         get() {
           let user = ''
@@ -118,7 +113,7 @@
         }
         switch (n) {
           case '首页':
-            this.$router.push('/home');
+            this.$router.push('/');
             break;
           case '数据采集-数据采集':
             this.$router.push('/edit');
@@ -183,6 +178,7 @@
             break;
           case '已登录':
             this.$store.commit('SET_NOTICE', '已登录');
+            this.$router.push('/');
             break;
           default:
             this.$store.commit('SET_NAVBAR', '登陆页');
