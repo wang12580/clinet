@@ -93,19 +93,12 @@ export function getStat(obj, data, opt, tableType) {
     }
   }
   let url = ''
-  switch (opt.type) {
-    case '机构':
-      url = `&org=${opt.value}`
-      break;
-    case '时间':
-      url = `&time=${data[6]}`
-      break;
-    case '病种':
-      url = `&drg2=${data[6]}`
-      break;
-    default:
-      url = ''
-      break;
+  if (opt.type === '机构' || opt.type === 'org') {
+    url = `&org=${opt.value}`
+  } else if (opt.type === '时间' || opt.type === 'time') {
+    url = `&time=${opt.value}`
+  } else if (opt.type === '病种' || opt.type === 'drg' || opt.type === 'drg2') {
+    url = `&drg=${opt.value}`
   }
   axios({
     method: 'get',
@@ -115,7 +108,7 @@ export function getStat(obj, data, opt, tableType) {
   }).then((res) => {
     if (res.status === 200) {
       obj.$store.commit('SET_NOTICE', `当前${opt.page}页,共${res.data.count}页`)
-      const resObj = { page: parseInt(res.data.page, 10), countPage: res.data.count, data: res.data.stat, pageList: res.data.page_list, tableName: tableName }
+      const resObj = { page: parseInt(res.data.page, 10), countPage: res.data.count, data: res.data.stat, pageList: res.data.page_list, tableName: tableName, tableSel: res.data.num, dimensionOrg: res.data.org_num, dimensionTime: res.data.time_num, dimensionDrg: res.data.drg_num }
       obj.$store.commit('STAT_SET_COUNT_PAGE', res.data.count)
       obj.$store.commit('STAT_SET_SERVER_TABLE', resObj)
       if (tableType === 'edit') {

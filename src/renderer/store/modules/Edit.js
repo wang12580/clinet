@@ -7,9 +7,10 @@ const state = {
   docIndex: 0,
   filesIndex: null,
   fileIndex: null,
-  leftPanel: 'doc',
-  rightPanel: 'help',
+  leftPanel: 'table',
+  rightPanel: 'local',
   lastNav: '/edit',
+  fileName: '',
   filePage: 0,
   filesPage: 0,
   fileType: 'cda',
@@ -19,7 +20,7 @@ const state = {
   hint: [],
   helpType: '编辑器使用帮助',
   serverType: 'user',
-  docType: '',
+  docType: '自定义文档',
   selectedCol: [],
   selectedType: 'row'
 };
@@ -27,14 +28,15 @@ const state = {
 const mutations = {
   EDIT_UPDATE_DOC(state, m) {
     state.doc.splice(m[0], 1, m[1])
-    // if (m[0] === 0) {
-    //   state.doc.splice(0, 1, m[1])
-    // } else {
-    //   state.doc[m[0]] = m[1];
-    // }
   },
   EDIT_DELETE_ITEM(state, n) {
     state.doc.splice(n, 1);
+    state.editBarValue = state.doc[n]
+  },
+  EDIT_ADD_ITEM(state) {
+    const n = state.docIndex
+    state.doc.splice(n, 0, '');
+    state.editBarValue = ''
   },
   EDIT_DELETE_DOC(state, n) {
     state.file.splice(n, 1);
@@ -79,6 +81,7 @@ const mutations = {
   EDIT_LOAD_DOC(state, message) {
     const x = message.map(m => m.split(' ').filter(i => i !== ''))
     state.doc = x;
+    state.editBarValue = x[0]
   },
   EDIT_SET_DOC(state) {
     state.doc = [];
@@ -96,6 +99,7 @@ const mutations = {
   },
   EDIT_SET_FILES_INDEX(state, message) {
     state.filesIndex = message;
+    state.fileName = state.files[message]
   },
   EDIT_SET_FILE_INDEX(state, message) {
     state.fileIndex = message;
@@ -105,10 +109,14 @@ const mutations = {
   },
   EDIT_SET_LAST_NAV(state, message) {
     state.lastNav = message;
+    state.doc = []
+    // state.file = []
   },
   EDIT_SET_DOC_INDEX(state, m) {
-    if (m[1]) {
+    if (m[1] === true) {
       state.docIndex = 0;
+    } else if (m[1] === 'set') {
+      state.docIndex = m[0];
     } else {
       state.docIndex += m[0];
       if (state.docIndex < 0) { state.docIndex = 0 }
@@ -202,6 +210,7 @@ const actions = {
     commit('EDIT_DELETE_FILE');
     commit('EDIT_ADD_DOC');
     commit('EDIT_ADD_FILE');
+    commit('EDIT_ADD_ITEM');
     commit('EDIT_SAVE_DOC');
     commit('EDIT_SAVE_FILE');
     commit('EDIT_SET_FILE_TYPE');

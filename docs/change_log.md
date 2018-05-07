@@ -1,3 +1,17 @@
+### 2018-05-6
+* 部分click操作改为双击dblclick，比如stat里的小图跳转大图
+* 更换windows系统上的程序图标icon.jpg
+* 更新发布版本号0.1.5-180506（-后面的代表年月日）
+* 发布程序添加F8调取调试窗口
+### 2018-05-5
+* 修复ctrl+del键，删除doc的item。输入框出现各种操作bug的原因是输入框v-model="item"的item原来是data属性，后来改成了computed属性，所以原来使用的this.item = XXX的赋值方法就失效了，要通过state.editBarValue = state.doc[n]的方法来赋值了。
+* 修复空格键、左右键，都是space方法，判断光标左侧是空格时触发
+* 登陆后，默认进入edit页，默认显示右local和左table
+* ctrl+enter键，在doc中插入item
+### 2018-05-4
+* 修复login模块账号输入或粘贴，右侧开发工具中报错，报错后输入密码账号清空，再次输入账号登录失败。
+* clinet 数据采集点击获取项目并修改，这个要先在utils/EditDoc.js中把docIndex传进去，然后高亮也可以直接用docIndex了，现在用key的高亮就变成模糊查询的了。
+* ctrl+上下键，移动doc的item的位置
 ### 2018-05-3
 * edit页的左右toolbar上的《选择》可以显示选择的内容
 * app的body添加背景色，login页添加底图

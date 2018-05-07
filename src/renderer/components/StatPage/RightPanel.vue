@@ -6,10 +6,10 @@
         <left-panel></left-panel>
       </div>
       <div class="col">
-        <div id="chartLeft" style="width: 600px; height:400px;" v-on:click="chart('left')"></div>
+        <div id="chartLeft" style="width: 600px; height:400px;" v-on:dblclick="chart('left')"></div>
       </div>
       <div class="col">
-        <div id="chartRight" style="width: 600px; height:400px;" v-on:click="chart('right')"></div>
+        <div id="chartRight" style="width: 600px; height:400px;" v-on:dblclick="chart('right')"></div>
       </div>
       <div class="col">
         <div class="alert alert-danger" id="stat-right-prompt" role="alert" style="height:100%; overflow-y:auto;">
@@ -333,6 +333,7 @@
         } else {
           chartdata = this.$store.state.Stat.chartData
         }
+        // console.log(chartdata)
         switch (type) {
           case '柱状图':
             chartBar(id, chartdata)

@@ -8,13 +8,15 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-bottom">
       <input id="edit-editbar-input" style="line-height: 3" type="text" class="form-control"
       placeholder="请输入……" aria-label="Username" aria-describedby="basic-addon1" v-model="item"
-      v-on:keyup.enter="enter" v-on:keyup.up="up" v-on:keyup.down="down" v-on:keyup.left="left"
-      v-on:keyup.right="left" v-on:keyup.space="space" v-on:keyup.ctrl.left="itemUp"
-      v-on:keyup.ctrl.right="itemDown" v-on:keyup.ctrl.delete="del" v-on:keyup.ctrl.0="hintUp"
-      v-on:keyup.ctrl.110="hintDown" v-on:keyup.ctrl.97="hintSet(1)" v-on:keyup.ctrl.98="hintSet(2)"
+      v-on:input="change" v-on:keydown.enter="enter" v-on:keyup.ctrl.delete="del" v-on:keyup.ctrl.enter="addItem"
+      v-on:keyup.up="up" v-on:keyup.down="down" 
+      v-on:keydown.ctrl.up="itemUp" v-on:keydown.ctrl.down="itemDown"      
+      v-on:keyup.space="space" v-on:keyup.left="space" v-on:keyup.right="space"
+      v-on:keyup.ctrl.0="hintUp" v-on:keyup.ctrl.110="hintDown" 
+      v-on:keyup.ctrl.97="hintSet(1)" v-on:keyup.ctrl.98="hintSet(2)"
       v-on:keyup.ctrl.99="hintSet(3)" v-on:keyup.ctrl.100="hintSet(4)" v-on:keyup.ctrl.101="hintSet(5)"
       v-on:keyup.ctrl.102="hintSet(6)" v-on:keyup.ctrl.103="hintSet(7)" v-on:keyup.ctrl.104="hintSet(8)"
-      v-on:keyup.ctrl.105="hintSet(9)" v-on:input="change">
+      v-on:keyup.ctrl.105="hintSet(9)">
     </nav>
   </div>
 </template>
@@ -22,15 +24,17 @@
 <script>
 
   export default {
-    mounted: function () {
-      this.$nextTick(() => {
-        document.getElementById('edit-editbar-input').focus()
-      })
-    },
+    // mounted: function () {
+    //   this.$nextTick(() => {
+    //     document.getElementById('edit-editbar-input').focus()
+    //   })
+    // },
     computed: {
       item: {
         get() {
-          return this.$store.state.Edit.editBarValue
+          const x = this.$store.state.Edit.editBarValue
+          if (x) { return this.$store.state.Edit.editBarValue.toString().replace(/,/g, '  ') }
+          return ''
         },
         set: function () {
         }
@@ -67,41 +71,33 @@
           if (v.length > 0) {
             this.$store.commit('EDIT_UPDATE_DOC', [n, v]);
             this.$store.commit('EDIT_SET_DOC_INDEX', [1]);
-            const x = this.$store.state.Edit.doc[n + 1]
-            if (x) {
-              this.item = x.toString().replace(/,/g, '   ')
-            } else {
-              this.item = ''
-            }
           }
         } else {
           const col = this.$store.state.Edit.selectedCol[0]
           this.$store.commit('EDIT_UPDATE_FILE', [col, v[1]]);
-          this.item = ''
+        }
+      },
+      addItem() {
+        if (this.$store.state.Edit.fileType === 'cda') {
+          console.log('aaadd')
+          this.$store.commit('EDIT_ADD_ITEM');
         }
       },
       up() {
-        const n = this.$store.state.Edit.docIndex - 1
-        const x = this.$store.state.Edit.doc[n]
         this.$store.commit('EDIT_SET_DOC_INDEX', [-1]);
-        if (x) { this.item = x.toString().replace(/,/g, '  ') }
       },
       down() {
-        const n = this.$store.state.Edit.docIndex + 1
-        const x = this.$store.state.Edit.doc[n]
         this.$store.commit('EDIT_SET_DOC_INDEX', [1]);
-        if (x) { this.item = x.toString().replace(/,/g, '  ') }
       },
       itemUp() {
         if (this.$store.state.Edit.docIndex > 0 && this.$store.state.Edit.fileType === 'cda') {
           if (this.$store.state.Edit.doc.length > this.$store.state.Edit.docIndex) {
-            const n1 = this.$store.state.Edit.docIndex
+            const n1 = this.$store.state.Edit.docIndex - 1
             const v1 = this.$store.state.Edit.doc[n1]
-            const n2 = this.$store.state.Edit.docIndex - 1
+            const n2 = this.$store.state.Edit.docIndex
             const v2 = this.$store.state.Edit.doc[n2]
             this.$store.commit('EDIT_UPDATE_DOC', [n1, v2]);
             this.$store.commit('EDIT_UPDATE_DOC', [n2, v1]);
-            this.$store.commit('EDIT_SET_DOC_INDEX', [-1]);
           }
         }
       },
@@ -113,34 +109,19 @@
           const v2 = this.$store.state.Edit.doc[n2]
           this.$store.commit('EDIT_UPDATE_DOC', [n1, v2]);
           this.$store.commit('EDIT_UPDATE_DOC', [n2, v1]);
-          this.$store.commit('EDIT_SET_DOC_INDEX', [1]);
         }
       },
       del() {
         if (this.$store.state.Edit.fileType === 'cda') {
           const n1 = this.$store.state.Edit.docIndex
-          const n2 = this.$store.state.Edit.docIndex + 1
-          const x = this.$store.state.Edit.doc[n2]
-          if (x) { this.item = x.toString().replace(/,/g, '   ') } else { this.item = '' }
           this.$store.commit('EDIT_DELETE_ITEM', n1);
         }
       },
-      left() {
+      space() {
         const aa = document.getElementById('edit-editbar-input')
         const start = aa.selectionStart;
-        const value = this.$store.state.Edit.editBarValue.slice(0, start)
-        const value1 = value.replace(/\s/ig, '')
-        if (global.hitbdata.cdh[value1] !== undefined) {
-          this.$store.commit('EDIT_SET_HINT', global.hitbdata.cdh[value1]);
-          this.$store.commit('EDIT_SET_HINT_TYPE', 'hint');
-        } else {
-          this.$store.commit('EDIT_SET_HINT_TYPE', 'notice');
-          this.$store.commit('SET_NOTICE', '无提示信息');
-        }
-      },
-      space() {
-        const value = this.$store.state.Edit.editBarValue
-        if (value && value.indexOf(' ') > -1) {
+        if (start > 0 && this.$store.state.Edit.editBarValue[start - 1] === ' ') {
+          const value = this.$store.state.Edit.editBarValue.slice(0, start)
           const value1 = value.replace(/\s/ig, '')
           if (global.hitbdata.cdh[value1] !== undefined) {
             this.$store.commit('EDIT_SET_HINT', global.hitbdata.cdh[value1]);

@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron' // eslint-disable-line
+import { app, BrowserWindow, globalShortcut } from 'electron' // eslint-disable-line
 // const { ipcMain } = require('electron')
 // todo:'electron' should be listed in the project's dependencies, not devDependencies
 // ipcMain.on('asynchronous-message', (event, arg) => {
@@ -28,9 +28,9 @@ function createWindow() {
    * Initial window options
    */
   mainWindow = new BrowserWindow({
-    height: 563,
+    height: 0,
     useContentSize: true,
-    width: 1000,
+    width: 0,
     autoHideMenuBar: true,
   });
 
@@ -38,6 +38,10 @@ function createWindow() {
 
   mainWindow.on('closed', () => {
     mainWindow = null;
+  });
+
+  globalShortcut.register('F8', () => {
+    mainWindow.toggleDevTools();
   });
 
   mainWindow.maximize();

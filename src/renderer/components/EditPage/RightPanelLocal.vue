@@ -2,9 +2,10 @@
   <div style="overflow:auto;">
     <table id="edit-rightpanellocal-table">
       <tr>
-        <th class="table-danger" id="edit-rightpanellocal-title"> {{title}}</th>
+        <th colspan="10" class="table-info" id="edit-rightpanellocal-title"> {{title}}</th>
       </tr>
       <tr class="edit-rightpanellocal-tr" v-for="(data, index) in xs" v-bind:key='index' v-on:click="loadFile(data, index)" v-bind:class="{'table-danger':flag == index}">
+        <td>{{index + 1}}</td>
         <td>{{data}}</td>
       </tr>
     </table>
@@ -21,17 +22,17 @@
     computed: {
       title: {
         get() {
-          let x = '用户本地文件'
-          if (this.$store.state.Edit.rightPanel === 'server') { x = '用户远程文件' }
+          let x = '用户本地文件列表'
+          if (this.$store.state.Edit.rightPanel === 'server') { x = '用户远程文件列表' }
           switch (this.$store.state.Edit.lastNav) {
             case '/stat':
-              x = '数据分析文件'
+              x = '数据分析文件列表'
               break;
             case '/library':
-              x = '术语字典文件'
+              x = '术语字典文件列表'
               break;
             case '/system':
-              x = '本地导入文件'
+              x = '本地导入文件列表'
               break;
             default:
               break
