@@ -65,7 +65,7 @@
             <input type="text" class="form-control" placeholder="" v-model="bvalue">
           </div>
           <button type="submit" class="btn btn-primary" v-on:click="selX(data)">查询</button>
-          <button type="submit" class="btn btn-primary" v-on:click="selX">清空</button>
+          <button type="submit" class="btn btn-primary" v-on:click="selX()">清空</button>
         </form>
       </div>
     </div>
@@ -180,7 +180,7 @@
         get() {
           let f = []
           if (this.$store.state.Stat.tableType === 'compare') {
-            f = []
+            f = this.$store.state.Stat.selectedRow
           } else if (this.$store.state.Stat.tableType === 'case') {
             f = this.$store.state.Stat.caseSelectedRow
           } else {
@@ -194,7 +194,7 @@
         get() {
           let f = []
           if (this.$store.state.Stat.tableType === 'compare') {
-            f = []
+            f = this.$store.state.Stat.selectedCol
           } else if (this.$store.state.Stat.tableType === 'case') {
             f = this.$store.state.Stat.caseSelectedCol
           } else {
@@ -279,7 +279,7 @@
               }
               break;
             case 'server':
-              if (data[0] === '机构' && data[1] === '时间') {
+              if ((data[0] === '机构' && data[1] === '时间') || data[0] === 'year_time') {
                 this.$store.commit('STAT_SET_COL', index);
               }
               if (index === cindex && data !== this.$store.state.Stat.serverTable.data[0]) {
@@ -299,6 +299,11 @@
             case 'case':
               if (data[0] === '病案ID' && data[1] === '主要诊断') {
                 this.$store.commit('STAT_SET_CASE_COL', index);
+              }
+              break;
+            case 'compare':
+              if (data[0] === 'id') {
+                this.$store.commit('STAT_SET_COL', index);
               }
               break;
             default:

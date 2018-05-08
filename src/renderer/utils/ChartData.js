@@ -5,11 +5,15 @@ export default function chartData(obj, table, xid = [], yid = []) {
   let yArr = []
   const stat = []
   // 按照逗号切分并取得表头
-  // console.log(table)
   table = table.map((x) => {
     let y = []
     if (Array.isArray(x)) {
       y = x
+    } else if (typeof (x) === 'object') {
+      const keys = Object.keys(x)
+      const newArr = []
+      newArr.push(keys.map(k => x[k]))
+      y = newArr
     } else {
       y = x.split(',')
     }
@@ -21,6 +25,8 @@ export default function chartData(obj, table, xid = [], yid = []) {
     const th = table[0].filter(x => x !== 'stat_type')
     if (th.includes('org') && th.includes('time')) {
       yArr = ['org', 'time']
+    } else if (th.includes('year_time')) {
+      yArr = []
     } else {
       yArr = ['机构', '时间']
     }
@@ -60,7 +66,9 @@ export default function chartData(obj, table, xid = [], yid = []) {
     xArr.forEach((xs) => {
       const obj = {}
       yArr.forEach((y) => {
-        obj[y] = xs[y]
+        if (xs !== undefined) {
+          obj[y] = xs[y]
+        }
       })
       // console.log(obj)
       stat.push(obj)

@@ -12,20 +12,21 @@
           </a>
           <div class="dropdown-menu" aria-labelledby="edit-rightbar-choice">
             <a class="dropdown-item" href="#" v-on:click='help("编辑器使用帮助")' id="edit-rightbar-editorHelp">编辑器使用帮助</a>
-            <a class="dropdown-item" href="#" v-on:click='help("输入框提示")' id="edit-rightbar-inputPrompt">输入框提示</a>
             <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="#" v-on:click='help("病案历史")' id="edit-rightbar-medicalHistory">病案历史</a>
+            <a class="dropdown-item" href="#" v-on:click='help("输入框提示")' id="edit-rightbar-inputPrompt">输入框提示</a>
             <a class="dropdown-item" href="#" v-on:click='help("病案参考")' id="edit-rightbar-medicalRefer">病案参考</a>
+            <a class="dropdown-item" href="#" v-on:click='help("病案历史")' id="edit-rightbar-medicalHistory">病案历史</a>
+            <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="#" v-on:click='help("drg分析")'>drg分析</a>
           </div>
         </li>
         <li class="nav-item active" v-on:click='help(null)' id="edit-rightbar-help">
           <a class="nav-link text-light" href="#"> 帮助 <span class="sr-only">(current)</span></a>
         </li>
-        <li class="nav-item active" v-on:click='localData' id="edit-rightbar-local">
+        <li class="nav-item active" v-on:click='localData()' id="edit-rightbar-local">
           <a class="nav-link text-light" href="#"> 本地文件 <span class="sr-only">(current)</span></a>
         </li>
-        <li class="nav-item active" v-on:click='serverData' id="edit-rightbar-server">
+        <li class="nav-item active" v-on:click='serverData()' id="edit-rightbar-server">
           <a class="nav-link text-light" href="#"> 远程文件 <span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item active">
@@ -36,7 +37,7 @@
         </li>
       </ul>
       <form class="form-inline my-2 my-lg-0" v-on:submit.prevent>
-        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" v-on:keyup.enter="rightEnter" v-model="rightItem">
+        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" v-on:keyup.enter="rightEnter()" v-model="rightItem">
       </form>
     </div>
   </nav>

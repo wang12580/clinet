@@ -6,10 +6,10 @@
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
-        <li class="nav-item active" v-if="this.$store.state.Stat.tableType === 'case'" v-on:click='backTable'>
+        <li class="nav-item active" v-if="this.$store.state.Stat.tableType === 'case'" v-on:click='backTable()'>
           <a class="nav-link text-light" href="#"> 返回 <span class="sr-only">(current)</span></a>
         </li>
-        <li class="nav-item active" id="stat-local-doc" v-on:click='loadData'>
+        <li class="nav-item active" id="stat-local-doc" v-on:click='loadData()'>
           <a class="nav-link text-light" href="#"> 本地文件 <span class="sr-only">(current)</span></a>
         </li>
         <!-- <li class="nav-item dropdown">
@@ -24,7 +24,7 @@
             <a id="stat-left-chart-pie-map" class="nav-link" href="#" v-on:click='serverData("Drg分析")'> drg分析 <span class="sr-only">(current)</span></a>
           </div>
         </li> -->
-        <li class="nav-item active" id="stat-remote-file" v-on:click='serverData'>
+        <li class="nav-item active" id="stat-remote-file" v-on:click='serverData()'>
           <a class="nav-link text-light" href="#"> 远程文件 <span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item active" id="stat-prev-page" v-on:click='page(-1)'>
@@ -33,16 +33,16 @@
         <li class="nav-item active" id="stat-next-page" v-on:click='page(1)'>
           <a class="nav-link text-light" href="#"> 后页 <span class="sr-only">(current)</span></a>
         </li>
-        <li class="nav-item active" id="stat-edit-data" v-on:click='edit'>
+        <li class="nav-item active" id="stat-edit-data" v-on:click='edit()'>
           <a class="nav-link text-light" href="#"> 编辑数据 <span class="sr-only">(current)</span></a>
         </li>
-        <li class="nav-item active" id="stat-join-contrast" v-on:click='compare'>
+        <li class="nav-item active" id="stat-join-contrast" v-on:click='compare()'>
           <a class="nav-link text-light" href="#"> 加入对比 <span class="sr-only">(current)</span></a>
         </li>
-        <li class="nav-item active" id="stat-show-contrast" v-on:click='showCompare'>
+        <li class="nav-item active" id="stat-show-contrast" v-on:click='showCompare()'>
           <a class="nav-link text-light" href="#"> 显示对比 <span class="sr-only">(current)</span></a>
         </li>
-        <li class="nav-item active" id="stat-save-contrast" v-on:click='saveCompare'>
+        <li class="nav-item active" id="stat-save-contrast" v-on:click='saveCompare()'>
           <a class="nav-link text-light" href="#"> 保存对比 <span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item dropdown">
@@ -87,12 +87,12 @@
         <li class="nav-item active" id="stat-next-page" v-on:click='title(10)' v-if="this.$store.state.Stat.haveRight">
           <a class="nav-link text-light" href="#"> 右页 <span class="sr-only">(current)</span></a>
         </li>
-        <li class="nav-item active" id="stat-edit-data" v-on:click='edit'>
+        <li class="nav-item active" id="stat-edit-data" v-on:click='edit()'>
           <a class="nav-link text-light" href="#"> 详情 <span class="sr-only">(current)</span></a>
         </li>
       </ul>
       <form class="form-inline my-2 my-lg-0" v-on:submit.prevent>
-        <input id="stat-right-search" class="mr-sm-2 form-control" type="search" placeholder="Search" aria-label="Search" v-on:keyup.13="statSearch" v-model="stat">
+        <input id="stat-right-search" class="mr-sm-2 form-control" type="search" placeholder="Search" aria-label="Search" v-on:keyup.13="statSearch()" v-model="stat">
       </form>
     </div>
   </nav>
@@ -174,7 +174,6 @@
               this.$store.commit('STAT_TABLE_PAGE', n);
               this.$store.commit('SET_NOTICE', `当前${this.$store.state.Stat.tablePage}页,共${this.$store.state.Stat.countPage}页`)
               table = this.$store.state.Stat.localTable
-              console.log(table)
               chartData(this, table, this.$store.state.Stat.selectedRow, this.$store.state.Stat.selectedCol)
               break;
             default:
@@ -339,8 +338,6 @@
       compare: function () {
         let table = []
         let header = []
-        console.log('111')
-        console.log(this.$store.state.Stat.localTable)
         switch (this.$store.state.Stat.tableType) {
           case 'server':
             table = this.$store.state.Stat.serverTable.data
@@ -358,9 +355,11 @@
         const compareTable = this.$store.state.Stat.compareTable
         if (this.$store.state.Stat.tableType !== 'compare') {
           if (row.length > 0) {
-            console.log('====')
-            console.log(compareTable, table, header)
-            addContrast(this, table, compareTable, header, col, row)
+            if (col.length > 0) {
+              addContrast(this, table, compareTable, header, col, row)
+            } else {
+              this.$store.commit('SET_NOTICE', '请选择加入对比行!');
+            }
           } else {
             this.$store.commit('SET_NOTICE', '请选择加入对比数据!');
           }
