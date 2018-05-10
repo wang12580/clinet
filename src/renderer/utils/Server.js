@@ -269,6 +269,7 @@ export function sCreateDepart(obj, data) {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
     responseType: 'json'
   }).then((res) => {
+    console.log(res)
     if (res.status === 201) {
       if (res.data.success) {
         obj.$store.commit('SYSTEM_NEW_DEPARTMENT', [res.data, '科室创建成功', true])
@@ -297,7 +298,8 @@ export function sUpdateDepart(obj, data) {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
     responseType: 'json'
   }).then((res) => {
-    if (res.status === 201) {
+    console.log(res)
+    if (res.status === 200) {
       if (res.data.success) {
         obj.$store.commit('SYSTEM_NEW_DEPARTMENT', [res.data, '科室更新成功', true])
         // obj.$store.commit('SYSTEM_SET_TOOLBAR', 'getDepart')
@@ -415,7 +417,7 @@ export function sGetCompRule(obj, data) {
   }
   axios({
     method: 'get',
-    url: `http://${data[0]}:${data[1]}/drgserver/rule?table=${table}&code=${code}`,
+    url: `http://${data[0]}:${data[1]}/library/server_rule?table=${table}&code=${code}`,
     headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
     responseType: 'json'
   }).then((res) => {
@@ -438,16 +440,16 @@ export function sCompDrg(obj, data, type = '') {
   let url = ''
   switch (version) {
     case 'BJ':
-      url = `http://${data[0]}:${data[1]}/drgserver/comp_drg_bj/`
+      url = `http://${data[0]}:${data[1]}/drgserverbj/comp_drg/`
       break;
     case 'GB':
-      url = `http://${data[0]}:${data[1]}/drgserver/comp_drg_gb/`
+      url = `http://${data[0]}:${data[1]}/drgservergb/comp_drg/`
       break;
     case 'CN':
-      url = `http://${data[0]}:${data[1]}/drgserver/comp_drg_cn/`
+      url = `http://${data[0]}:${data[1]}/drgserver/comp_drg/`
       break;
     default:
-      url = `http://${data[0]}:${data[1]}/drgserver/comp_drg_cn/`
+      url = `http://${data[0]}:${data[1]}/drgserver/comp_drg/`
   }
   if (dataWt4) {
     if (type !== '') {
@@ -464,8 +466,13 @@ export function sCompDrg(obj, data, type = '') {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
       responseType: 'json'
     }).then((res) => {
+      console.log(res);
       if (res.status === 200) {
-        obj.$store.commit('SYSTEM_GET_WT4_COMP', [res.data.result, '病案分组成功', true])
+        if (version === 'CN') {
+          obj.$store.commit('SYSTEM_GET_WT4_COMP', [res.data.result, '病案分组成功', true])
+        } else {
+          obj.$store.commit('SYSTEM_GET_WT4_COMP', [res.data, '病案分组成功', true])
+        }
       } else {
         obj.$store.commit('SYSTEM_GET_WT4_COMP', [{}, '病案分组失败', true])
       }
