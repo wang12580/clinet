@@ -348,7 +348,13 @@ export function sGetWt4(obj, data) {
           }))
         })
         res.data.data = newWt4
-        obj.$store.commit('STAT_SET_SERVER_TABLE', res.data)
+        // const resObj = { page: parseInt(res.data.page, 10), countPage: res.data.count, data: res.data.stat, pageList: res.data.page_list, tableName: tableName, tableSel: res.data.num, dimensionOrg: res.data.org_num, dimensionTime: res.data.time_num, dimensionDrg: res.data.drg_num }
+        const a = res.data
+        a.tableSel = res.data.num
+        a.dimensionOrg = res.data.org_num
+        a.dimensionTime = res.data.time_num
+        a.dimensionDrg = res.data.drg_num
+        obj.$store.commit('STAT_SET_SERVER_TABLE', a)
         ChartData.default(obj, res.data.data, obj.$store.state.Stat.selectedRow, obj.$store.state.Stat.selectedCol)
         switch (obj.$store.state.Stat.chartLeft) {
           case '柱状图':
@@ -508,8 +514,48 @@ export function sGetTarget(obj, data, type) {
     obj.$store.commit('SYSTEM_GET_TARGET', {})
   })
 }
+
+function fileInsert(obj, data) {
+  axios({
+    method: 'GET',
+    url: `http://${data[0]}:${data[1]}/servers/wt4_insert`,
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+    responseType: 'json'
+  }).then((res) => {
+    console.log(res)
+    if (res.status === 200) {
+      obj.$store.commit('SYSTEM_UPLOAD_FILE', res)
+      obj.$store.commit('SET_NOTICE', `文件上传${res.data.result}条`)
+    } else {
+      obj.$store.commit('SYSTEM_PROVINCE', [])
+    }
+  }).catch((err) => {
+    console.log(err)
+    obj.$store.commit('SYSTEM_PROVINCE', [])
+  })
+}
+
+function fileUploadDoc(obj, data, res) {
+  axios({
+    method: 'GET',
+    url: `http://${data[0]}:${data[1]}/hospitals/json_check?file_path=${res.file_path}`,
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+    responseType: 'json'
+  }).then((res) => {
+    if (res.status === 200) {
+      fileInsert(obj, data)
+      // obj.$store.commit('SYSTEM_PROVINCE', res.data)
+    } else {
+      obj.$store.commit('SYSTEM_PROVINCE', [])
+    }
+  }).catch((err) => {
+    console.log(err)
+    obj.$store.commit('SYSTEM_PROVINCE', [])
+  })
+}
 // 上传病案
 export function sUploadDoc(obj, data) {
+  console.log(data)
   if (data[3] && data[2]) {
     const content = data[3].join('\n')
     const objFile = new File([content], data[2]);
@@ -521,14 +567,15 @@ export function sUploadDoc(obj, data) {
       if (xhr.readyState === 4 && xhr.status === 200) {
         obj.$store.commit('SET_NOTICE', '文件上传成功!')
         const res = JSON.parse(xhr.responseText)
-        obj.$store.commit('SYSTEM_UPLOAD_FILE', res)
+        fileUploadDoc(obj, data, res)
       } else {
-        obj.$store.commit('SYSTEM_UPLOAD_FILE', {})
+        // obj.$store.commit('SYSTEM_UPLOAD_FILE', {})
       }
     }
     xhr.send(fd);
   }
 }
+
 // 获取省份
 export function sGetProvince(obj, data) {
   axios({

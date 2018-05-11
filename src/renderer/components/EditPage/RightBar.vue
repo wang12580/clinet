@@ -10,18 +10,18 @@
           <a class="nav-link dropdown-toggle text-light" href="#" id="edit-rightbar-choice" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             {{helpType}}
           </a>
-          <div class="dropdown-menu" aria-labelledby="edit-rightbar-choice">
+          <div class="dropdown-menu" id="edit-rightbar-sel" aria-labelledby="edit-rightbar-choice">
             <a class="dropdown-item" href="#" v-on:click='help("编辑器使用帮助")' id="edit-rightbar-editorHelp">编辑器使用帮助</a>
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="#" v-on:click='help("输入框提示")' id="edit-rightbar-inputPrompt">输入框提示</a>
             <a class="dropdown-item" href="#" v-on:click='help("病案参考")' id="edit-rightbar-medicalRefer">病案参考</a>
             <a class="dropdown-item" href="#" v-on:click='help("病案历史")' id="edit-rightbar-medicalHistory">病案历史</a>
             <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="#" v-on:click='help("在线交流")'>在线交流</a>
+            <a class="dropdown-item" href="#" v-on:click='help("在线交流")' id="edit-rightbar-onlineSay">在线交流</a>
             <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="#" v-on:click='help("drg分析")'>DRG分析</a>
-            <div class="dropdown-divider"></div>            
-            <a class="dropdown-item" href="#" v-on:click='help("HIS接口")'>HIS接口</a>
+            <a class="dropdown-item" href="#" v-on:click='help("drg分析")' id="edit-rightbar-drgStat">DRG分析</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#" v-on:click='help("HIS接口")' id="edit-rightbar-hisInterface">HIS接口</a>
           </div>
         </li>
         <li class="nav-item active" v-on:click='help(null)' id="edit-rightbar-help">
@@ -93,7 +93,7 @@
         this.$store.commit('EDIT_SET_HINT_TYPE', 'notice');
       },
       serverData: function () {
-        this.$store.commit('EDIT_SET_SERVER_TYPE', 'server');
+        this.$store.commit('EDIT_SET_SERVER_TYPE', 'user');
         this.$store.commit('EDIT_SET_LEFT_PANEL', 'table');
         if (!this.$store.state.System.user.login) {
           this.$store.commit('SET_NOTICE', '未登录用户,请在系统服务-用户设置内登录');
@@ -101,7 +101,7 @@
           this.$store.commit('EDIT_SET_RIGHT_PANEL', 'server');
         } else {
           this.$store.commit('SET_NOTICE', '读取远程文件');
-          getEditFiles(this, [this.$store.state.System.server, this.$store.state.System.port, this.$store.state.Edit.serverType])
+          getEditFiles(this, [this.$store.state.System.server, this.$store.state.System.port, this.$store.state.Edit.serverType, this.$store.state.System.user.username])
           this.$store.commit('EDIT_SET_RIGHT_PANEL', 'server');
         }
       },
@@ -173,7 +173,7 @@
           }
           this.rightItem = ''
         } else if (this.$store.state.Edit.rightPanel === 'server' && this.$store.state.Edit.serverType === 'file') {
-          getEditFiles(this, [this.$store.state.System.server, this.$store.state.System.port, this.$store.state.Edit.serverType, e.target.value])
+          getEditFiles(this, [this.$store.state.System.server, this.$store.state.System.port, this.$store.state.Edit.serverType, e.target.value, this.$store.state.System.user.username])
           if (this.$store.state.Edit.files === []) {
             this.$store.commit('SET_NOTICE', '未查找到，请输入完整用户名！')
           }
