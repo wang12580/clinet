@@ -154,10 +154,12 @@
     },
     methods: {
       onClick: function (data, index) {
+        console.log(this.$store.state.System.toolbar)
         this.flag = index
         this.$store.commit('SYSTEM_SET_SERVER_TABLE', data);
         switch (this.$store.state.System.toolbar) {
           case 'files':
+            this.$store.commit('SYSTEM_SET_SERVER_LOAD_TABLE', index);
             loadFile(this, data, 'system-home')
             break;
           case 'tables':

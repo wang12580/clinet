@@ -69,7 +69,8 @@ const state = {
   checkDataNum: 0,
   checkDataPage: 0,
   // 文件上传信息
-  upLoadFile: []
+  upLoadFile: [],
+  loadTable: 0
 };
 
 const mutations = {
@@ -332,6 +333,8 @@ const mutations = {
     let table = []
     if (value[0].length > 10) {
       table = value.map(n => n.slice(0, 10)).slice(0, 21)
+    } else {
+      table = value
     }
     state.checkDataAll = value
     state.checkData = table
@@ -361,6 +364,9 @@ const mutations = {
     if (c.length !== 1) {
       state.checkData = c
     }
+  },
+  SYSTEM_SET_SERVER_LOAD_TABLE(state, value) {
+    state.loadTable = value
   }
 };
 
@@ -409,6 +415,7 @@ const actions = {
     commit('SYSTEM_GET_TARGET_LIST');
     commit('SYSTEM_GET_CHECKDATA');
     commit('SYSTEM_GET_CHECKDATA_PAGE');
+    commit('SYSTEM_SET_SERVER_LOAD_TABLE');
   },
 };
 
