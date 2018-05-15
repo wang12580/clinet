@@ -93,11 +93,24 @@
             let body = n.split(',')
             y.forEach((n1) => {
               const type = typeof (body[header.indexOf(n1[5])])
-              if (n1[3] === type) {
+              if (n1[3] !== type) {
+                if (n1[3] === 'string') {
+                  const a = String(body[header.indexOf(n1[5])])
+                  body = [...body, a]
+                } else if (n1[3] === 'integer') {
+                  const a = Number(body[header.indexOf(n1[5])])
+                  body = [...body, a]
+                } else if (n1[3] === 'boolean') {
+                  const a = Boolean(body[header.indexOf(n1[5])])
+                  body = [...body, a]
+                } else {
+                  console.log('数据类型校验错误')
+                }
+              } else {
                 body = [...body, body[header.indexOf(n1[5])]]
                 this.$store.commit('SET_NOTICE', '数据校验成功');
-              } else {
-                console.log('数据类型校验错误');
+                yCol = [...yCol, n1[5]]
+                xRow = [...xRow, body[header.indexOf(n1[5])]]
               }
             });
             files.push(body);
