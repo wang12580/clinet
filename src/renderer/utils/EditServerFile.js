@@ -63,6 +63,7 @@ export function saveEdit(obj, data) {
   const fileName = data[2]
   const content = data[3]
   const username = data[4]
+  const doctype = data[6]
   // let url = ''
   // if (data[5] === 1) {
   const url = `http://${data[0]}:${data[1]}/edit/cda`
@@ -72,7 +73,7 @@ export function saveEdit(obj, data) {
   axios({
     method: 'post',
     url: url,
-    data: qs.stringify({ file_name: fileName, content: content[0], username: username }),
+    data: qs.stringify({ file_name: fileName, content: content[0], username: username, doctype: doctype }),
     headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
     responseType: 'json'
   }).then((res) => {
@@ -89,4 +90,14 @@ export function saveEdit(obj, data) {
     console.log(err);
     obj.$store.commit('SET_NOTICE', '保存失败')
   })
+}
+
+export function getDocTypes(obj) {
+  console.log(obj)
+  obj.$store.commit('SET_NOTICE', '远程docType未查询')
+}
+
+export function getHelps(obj) {
+  console.log(obj)
+  obj.$store.commit('SET_NOTICE', '远程帮助未查询')
 }
