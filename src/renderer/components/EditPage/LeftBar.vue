@@ -64,7 +64,7 @@
   import { saveEdit, getDocContent } from '../../utils/EditServerFile'
   import { getStat } from '../../utils/StatServerFile'
   import { getLibrary } from '../../utils/LibraryServerFile';
-  // import { message } from '../../utils/Socket'
+  import { message } from '../../utils/Socket'
   export default {
     data() {
       return {
@@ -72,10 +72,17 @@
         leftItem: '',
         docType: '自定义文档',
         saveTypes: ['保存病案', '保存模板'],
-        saveType: '保存病案',
+        // saveType: '',
       };
     },
     computed: {
+      saveType: {
+        get() {
+          const type = '保存病案'
+          return type
+        },
+        set() {}
+      },
       fileName: {
         get() {
           return this.$store.state.Edit.fileName
@@ -108,10 +115,9 @@
           this.$store.commit('EDIT_SET_DOC_TYPE', n)
         } else { n = this.$store.state.Edit.docType }
         this.$store.commit('SET_NOTICE', n);
-        if (this.$store.state.System.user.login) {
+        if (this.$store.state.Edit.rightPanel === 'server') {
           getDocContent(this, [this.$store.state.System.server, this.$store.state.System.port, this.$store.state.System.user.username, n])
         } else if (global.hitbmodel[n] !== undefined) {
-          console.log(global.hitbmodel[n])
           this.$store.commit('EDIT_LOAD_DOC', global.hitbmodel[n])
           this.$store.commit('EDIT_ADD_DOC', '');
         } else { this.$store.commit('EDIT_SET_DOC'); }
@@ -172,7 +178,6 @@
         }
       },
       saveDoc: function () {
-        // message(this, this.$store.state.Edit.file[this.$store.state.Edit.fileIndex], this.$store.state.System.user.username, 'doc')
         const fileIndex = this.$store.state.Edit.fileIndex
         if (fileIndex >= 0) {
           let doc = this.$store.state.Edit.doc
@@ -185,19 +190,31 @@
       },
       save: function (data) {
         const fileName = this.$store.state.Edit.fileName
-        console.log(fileName);
         let doc = this.$store.state.Edit.doc
         doc = doc.filter(x => x !== '')
         doc = doc.map(x => x.join(' '))
         let x = ''
         let p = ''
-        if (fileName.includes('@')) {
+        if (this.$store.state.Edit.helpType === '在线交流') {
+          message(this, this.$store.state.Edit.file[this.$store.state.Edit.fileIndex], this.$store.state.System.user.username, 'doc')
+        } else if (fileName.includes('@')) {
           if (data === '保存模板') {
-            saveEdit(this, [this.$store.state.System.server, this.$store.state.System.port, this.$store.state.Edit.files[this.$store.state.Edit.filesIndex], [doc.toString()], this.$store.state.System.user.username, 1, this.$store.state.Edit.docType, '模板'])
+            this.saveType = '保存模板'
+            if (!this.$store.state.Edit.modelName) {
+              this.$store.commit('SET_NOTICE', '请输入模板名称！')
+            } else {
+              saveEdit(this, [this.$store.state.System.server, this.$store.state.System.port, this.$store.state.Edit.files[this.$store.state.Edit.filesIndex], [doc.toString()], this.$store.state.System.user.username, 1, this.$store.state.Edit.modelName, '模板'])
+            }
           } else if (data === '保存病案') {
+            this.saveType = '保存病案'
             saveEdit(this, [this.$store.state.System.server, this.$store.state.System.port, this.$store.state.Edit.files[this.$store.state.Edit.filesIndex], [doc.toString()], this.$store.state.System.user.username, 1, this.$store.state.Edit.docType, '病案'])
           }
         } else {
+          if (data === '保存模板') {
+            this.saveType = '保存模板'
+          } else {
+            this.saveType = '保存病案'
+          }
           if (this.$store.state.Edit.lastNav === '/stat') {
             x = this.$store.state.Stat.fileName
           } else {

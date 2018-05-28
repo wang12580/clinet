@@ -44,7 +44,6 @@ export function getEdit(obj, data) {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
     responseType: 'json'
   }).then((res) => {
-    //
     if (res.status === 200) {
       obj.$store.commit('EDIT_LOAD_FILE', res.data)
       obj.$store.commit('EDIT_LOAD_FILE', res.data.cda)
@@ -97,7 +96,6 @@ export function getDocTypes(obj, data) {
   const server = data[0]
   const port = data[1]
   const username = data[2]
-  console.log(`http://${server}:${port}/edit/mouldlist?username=${username}`)
   axios({
     method: 'get',
     url: `http://${server}:${port}/edit/mouldlist?username=${username}`,
@@ -142,7 +140,7 @@ export function getDocContent(obj, data) {
     obj.$store.commit('SET_NOTICE', '模板内容查询失败')
   })
 }
-export function clinetHelpList(obj, data) {
+export function getHelpTypes(obj, data) {
   const server = data[0]
   const port = data[1]
   axios({
@@ -153,13 +151,15 @@ export function clinetHelpList(obj, data) {
   }).then((res) => {
     if (res.status === 200) {
       const b = res.data.result
-      console.log(b)
+      if (b) {
+        obj.$store.commit('EDIT_SET_HELP_TYPES', b)
+      }
     } else {
-      obj.$store.commit('SET_NOTICE', '远程帮组失败')
+      obj.$store.commit('SET_NOTICE', '远程帮助失败')
     }
   }).catch((err) => {
     console.log(err);
-    obj.$store.commit('SET_NOTICE', '远程帮组失败')
+    obj.$store.commit('SET_NOTICE', '远程帮助失败')
   })
 }
 export function clinetHelp(obj, data) {
@@ -176,15 +176,10 @@ export function clinetHelp(obj, data) {
       const b = res.data.result.split('\\n')
       console.log(b)
     } else {
-      obj.$store.commit('SET_NOTICE', '远程帮组失败')
+      obj.$store.commit('SET_NOTICE', '远程帮助失败')
     }
   }).catch((err) => {
     console.log(err);
-    obj.$store.commit('SET_NOTICE', '远程帮组失败')
+    obj.$store.commit('SET_NOTICE', '远程帮助失败')
   })
-}
-export function getHelpTypes(obj) {
-  console.log(obj)
-  obj.$store.commit('SET_NOTICE', '远程帮助未查询')
-  // obj.$store.commit('EDIT_SET_HELP_TYPES', '')
 }
