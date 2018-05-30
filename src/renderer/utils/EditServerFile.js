@@ -127,6 +127,7 @@ export function getDocContent(obj, data) {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
     responseType: 'json'
   }).then((res) => {
+    console.log(res);
     if (res.status === 200) {
       obj.$store.commit('SET_NOTICE', '模板内容查询成功')
       const con = res.data.result.split(',')
@@ -174,7 +175,8 @@ export function clinetHelp(obj, data) {
   }).then((res) => {
     if (res.status === 200) {
       const b = res.data.result.split('\\n')
-      console.log(b)
+      obj.$store.commit('EDIT_SET_RIGHT_CDH', b)
+      // console.log(b)
     } else {
       obj.$store.commit('SET_NOTICE', '远程帮助失败')
     }
