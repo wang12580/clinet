@@ -43,10 +43,10 @@
       xs: {
         get() {
           let x = global.hitbdata.cdh
-          if (this.$store.state.Edit.rightPanel === 'local') {
-            x = global.hitbdata.cdh
-          } else {
+          if (this.$store.state.Edit.rightPanel === 'server') {
             x = this.$store.state.Edit.rightCdh
+          } else {
+            x = global.hitbdata.cdh
           }
           return x
         },
