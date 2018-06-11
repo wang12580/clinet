@@ -195,4 +195,10 @@
     margin: 0;
     padding: 0;
   }
+  #navbarSupportedContent {
+    background-image: linear-gradient(to right , #4772fe, #7997fa);
+  }
+  .nav-link {
+    color:#ffffff;
+  }
 </style>

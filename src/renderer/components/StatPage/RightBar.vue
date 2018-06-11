@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-light bg-primary sticky-top">
+  <nav class="navbar navbar-expand-lg sticky-top">
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -452,5 +452,13 @@
     margin: 0;
     padding: 0;
   }
-
+  #navbarSupportedContent {
+    /* background: radial-gradient(to bottom, #4772fe 0%, #7997fa 0%); */
+    background-image: linear-gradient(to right , #4772fe, #7997fa);
+    /* background: #2f5ed4; */
+    color:#ffffff;
+  }
+  .nav-link {
+    color:#ffffff;
+  }
 </style>

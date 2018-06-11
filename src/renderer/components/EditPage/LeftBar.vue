@@ -25,7 +25,7 @@
           <a class="nav-link text-light" href="#" v-if="this.$store.state.Edit.leftPanel == 'table'">保存</a>
         </li>
         <li class="nav-item" id="edit-leftbar-newdoc" v-on:click="save('保存模板')">
-          <a class="nav-link text-light" href="#" v-if="this.$store.state.Edit.leftPanel == 'table'">另存为模板</a>
+          <a class="nav-link text-light" href="#" v-if="this.$store.state.Edit.leftPanel == 'table' && this.$store.state.Edit.rightPanel == 'server'">另存为模板</a>
         </li>
         <!-- <li class="nav-item" id="edit-leftbar-del" v-on:click="save(0)">
           <a class="nav-link text-light" href="#">去除</a>
@@ -246,5 +246,11 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+  }
+  #edit-leftbar-nav {
+    background-image: linear-gradient(to right , #4772fe, #7997fa);
+  }
+  .nav-link {
+    color:#ffffff;
   }
 </style>
