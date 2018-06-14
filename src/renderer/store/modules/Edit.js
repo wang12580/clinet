@@ -38,7 +38,9 @@ const state = {
   rightType: null,
   loadFileName: '',
   downFile: [],
-  serverId: null
+  docHeader: null,
+  serverId: null,
+  docState: null
 };
 
 const mutations = {
@@ -280,11 +282,38 @@ const mutations = {
   },
   EDIT_SET_LOAD_FILENAME(state, value) {
     state.loadFileName = value
+  },
+  EDIT_SET_DOC_HEADER(state, value) {
+    state.docHeader = value
+  },
+  EDIT_SET_UPDATE_HEADER(state, value) {
+    state.docHeader[value[0]] = value[1]
+    console.log(state.docHeader)
+  },
+  EDIT_SET_DOC_STATE(state) {
+    const obj1 = state.docHeader
+    obj1['修改时间'] = obj1['修改时间'].replace(/-/g, '/')
+    obj1['修改时间'] = new Date(Date.parse(obj1['修改时间']))
+    obj1['缓存时间'] = obj1['缓存时间'].replace(/-/g, '/')
+    obj1['缓存时间'] = new Date(Date.parse(obj1['缓存时间']))
+    obj1['保存时间'] = obj1['保存时间'].replace(/-/g, '/')
+    obj1['保存时间'] = new Date(Date.parse(obj1['保存时间']))
+    if (obj1['修改时间'] > obj1['缓存时间']) {
+      state.docState = '未缓存'
+    } else if (obj1['缓存时间'] > obj1['保存时间']) {
+      state.docState = '未保存'
+    } else if (obj1['保存时间'] > obj1['缓存时间']) {
+      state.docState = '已保存'
+    } else {
+      state.docState = '正在编辑...'
+    }
   }
 };
 
 const actions = {
   someAsyncTask({ commit }) {
+    commit('EDIT_SET_DOC_STATE');
+    commit('EDIT_SET_DOC_HEADER');
     commit('EDIT_SERVER_ID');
     commit('EDIT_SET_RIGHT_TYPE');
     commit('EDIT_SET_RIGHT_FOLDS');
