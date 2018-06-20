@@ -146,3 +146,20 @@ export default function loadFile(obj, x, p, e = null) {
     obj.$store.commit('SET_NOTICE', '选择的不是CSV文件，不能导入！');
   }
 }
+export function sectionFile(obj) {
+  const file = path.format({
+    dir: global.hitbdata.path.system,
+    base: 'hitb_sections.cda'
+  });
+  fs.lstat(file, () => {
+    const fRead = fs.createReadStream(file);
+    const fReadline = readline.createInterface({ input: fRead });
+    const f = [];
+    fReadline.on('close', () => {
+      obj.$store.commit('SYSTEM_SECTION', f)
+    });
+    fReadline.on('line', (line) => {
+      f.push(line)
+    })
+  })
+}

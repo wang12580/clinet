@@ -83,7 +83,8 @@
       doc: {
         get() {
           const doc = this.$store.state.Edit.docShow
-          const doc1 = editDoc(doc)
+          const sectionList = this.$store.state.System.systemSection
+          const doc1 = editDoc(doc, sectionList)
           return doc1
         }
       },
