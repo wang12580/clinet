@@ -119,6 +119,7 @@
         }
       },
       checkPage: function (value) {
+        console.log(this.$store.state.System.checkData.length)
         if (this.$store.state.System.checkData[0].length !== 10 && value === 'right') {
           this.$store.commit('SET_NOTICE', '当前已经是最后一页')
         } else if (this.$store.state.System.checkDataNum <= 0 && value === 'left') {

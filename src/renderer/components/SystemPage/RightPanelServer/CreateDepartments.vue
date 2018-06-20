@@ -50,6 +50,7 @@
 <script>
   export default {
     data() {
+      console.log(this.$store.state.System.departmentInfo);
       return {
         DepartmentInfo: {
           org: this.$store.state.System.departmentInfo.org,

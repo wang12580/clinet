@@ -32,7 +32,7 @@ const sections = [
   '医保科'
 ]
 
-function editDoc(x, sectionList) {
+function editDoc(x) {
   const obj = {}
   let key = '标题'
   let n = 0
@@ -41,11 +41,7 @@ function editDoc(x, sectionList) {
   x.forEach((x) => {
     x = [n].concat(x)
     n += 1
-    let sectionList1 = sections
-    if (sectionList.length !== 0) {
-      sectionList1 = sectionList
-    }
-    if (sectionList1.includes(x[1])) {
+    if (sections.includes(x[1])) {
       key = x
       if (!obj[key]) {
         obj[key] = []

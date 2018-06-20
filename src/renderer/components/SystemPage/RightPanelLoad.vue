@@ -66,10 +66,12 @@
     created: function () {
       this.height = document.body.clientHeight - 400
       loadFile(this, this.$store.state.System.serverTable, 'system-home')
+      // console.log(this.$store.state.System.serverTable);
     },
     methods: {
       onClick: function (data, index) {
         this.flag = index
+        // console.log(this.$store.state.System.table[n])
         this.$store.commit('SYSTEM_GET_FIELD', data);
         this.$store.commit('SYSTEM_GET_FIELD_INDEX', index);
       },

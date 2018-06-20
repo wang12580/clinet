@@ -173,7 +173,9 @@
           }
           // if (['local', 'server'].includes(this.$store.state.Stat.tableType)) {
           //   const header = this.$store.state.Stat.localTable[0];
+          //   console.log(this.$store.state.Stat.localTable)
           //   const a = []
+          //   console.log(header)
           //   if (header.length > 10) {
           //     const indexs = [...Array(10)].map((v, k) => k)
           //     table.forEach((xs) => {
@@ -258,6 +260,7 @@
     },
     methods: {
       onClickTd: function (data, index) {
+        // console.log(index)
         this.$store.commit('STAT_SET_XOBJ', [data[index], 0]);
         const header = this.$store.state.Stat.serverTable.data[0]
         let cindex = 0
@@ -350,6 +353,7 @@
         } else {
           chartdata = this.$store.state.Stat.chartData
         }
+        // console.log(chartdata)
         switch (type) {
           case '柱状图':
             chartBar(id, chartdata)

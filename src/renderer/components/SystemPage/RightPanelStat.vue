@@ -125,7 +125,8 @@
       },
       getStat: function (value, value1) {
         // if (value === 'index') {
-        //   this.$store.state.System.targetArray[this.$store.state.System.indexTable] = value1);
+        //   this.$store.state.System.targetArray[this.$store.state.System.indexTable] = value1
+        //   console.log(this.$store.state.System.targetArray);
         // }
         const values = [value, value1]
         this.$store.commit('SYSTEM_GET_SERVER_STAT', values);

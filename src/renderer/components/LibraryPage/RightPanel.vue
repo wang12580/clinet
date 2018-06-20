@@ -40,6 +40,7 @@
     },
     created: function () {
       this.height = document.body.clientHeight - 100
+      // console.log(document.body.clientHeight);
     },
     computed: {
       page: {

@@ -74,8 +74,7 @@ const state = {
   otherLogin: false,
   shareFileName: '',
   targetArray: [],
-  indexTable: '',
-  systemSection: []
+  indexTable: ''
 };
 
 const mutations = {
@@ -389,9 +388,6 @@ const mutations = {
   SYSTEM_SET_INDEX_TABLE(state, value) {
     state.indexTable = value
   },
-  SYSTEM_SECTION(state, value) {
-    state.systemSection = value
-  },
 };
 
 const actions = {
@@ -443,7 +439,6 @@ const actions = {
     commit('SYSTEM_SET_SERVER_LOAD_TABLE');
     commit('SYSTEM_GET_SHARE_FILE_NAME');
     commit('SYSTEM_SET_INDEX_TABLE');
-    commit('SYSTEM_SECTION');
   },
 };
 
