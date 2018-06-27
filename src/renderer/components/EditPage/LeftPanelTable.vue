@@ -214,7 +214,7 @@
           // this.$store.commit('EDIT_LOAD_DOC_SHOW', data.split(','))
           this.$store.commit('EDIT_SET_RIGHT_PANEL', 'help');
           this.$store.commit('EDIT_SET_HELP_TYPE', '病案参考');
-          editDocShow(this, data)
+          editDocShow(this, [this.$store.state.System.server, this.$store.state.System.port], data)
         }
         const doc = this.$store.state.Edit.doc
         editDocState(this, doc)
