@@ -176,7 +176,7 @@ export function clinetHelp(obj, data, name) {
 }
 
 
-export function getCdaHistory(obj, data, name, username) {
+export function getCaseHistory(obj, data, name, username) {
   const objs = {}
   name.forEach((n) => {
     if (['姓名', '年龄', '性别', '婚姻', '民族', '出生地', '职业'].includes(n[0])) {
@@ -196,8 +196,8 @@ export function getCdaHistory(obj, data, name, username) {
   }).then((res) => {
     if (res.status === 200) {
       console.log(res)
-    } else {
       obj.$store.commit('SET_NOTICE', '病案历史查询成功')
+      obj.$store.commit('EDIT_SET_DOC_HIS', res.data.result)
     }
   }).catch((err) => {
     console.log(err);
@@ -239,7 +239,7 @@ export function editDocState(obj, doc) {
   // console.log(obj1)
 }
 
-export function editDocShow(obj, value) {
+export function editDocShow(obj, data, value) {
   const value1 = value.split(',')
   const value2 = value1.map((x) => {
     const x1 = x.split(' ')
@@ -250,6 +250,18 @@ export function editDocShow(obj, value) {
     if (x[0] === '初步诊断') {
       diag = x
     }
+  })
+  axios({
+    method: 'post',
+    url: `http://${data[0]}:${data[1]}/edit/cda_consule`,
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+    data: qs.stringify({ diag: diag }),
+    responseType: 'json'
+  }).then((res) => {
+    console.log(res);
+  }).catch((err) => {
+    console.log(err);
+    obj.$store.commit('SET_NOTICE', '病案历史查询失败')
   })
   console.log(diag)
 }

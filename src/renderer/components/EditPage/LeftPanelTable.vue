@@ -7,7 +7,7 @@
           <a href="#" v-on:click="fold('编辑病案')" style="float: right; marginRight: 3px">↗</a>
         </th>
       </tr>
-      <tr class="edit-leftpaneltable-tr" v-for="(data, index) in file" v-bind:key='index' v-bind:class="{'table-warning':flag === index}">
+      <tr class="edit-leftpaneltable-tr" v-for="(data, index) in file" v-bind:key='index' v-bind:class="{'table-warning':flag === index, 'table-danger': isSave.includes(index)}">
         <td> {{index + 1}} </td>
         <td v-if="lastNav !== '/edit' && index < 10" v-for="(field, index) in data" v-bind:key='index' v-on:click="onClickTd(data, index)" v-bind:class="{'table-danger':flagTd.find((n)=>n===index)}">{{data[index]}}</td>
         <td v-if="lastNav === '/edit'">{{data.substr(0, 100)}}</td>
@@ -217,7 +217,7 @@
           this.$store.commit('EDIT_SET_RIGHT_PANEL', 'help');
           this.$store.commit('EDIT_SET_HELP_TYPE', '病案参考');
           doc = this.$store.state.Edit.docShow
-          editDocShow(this, data)
+          editDocShow(this, [this.$store.state.System.server, this.$store.state.System.port], data)
         }
         editDocState(this, doc)
         this.$store.commit('EDIT_SET_DOC_STATE')
