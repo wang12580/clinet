@@ -13,7 +13,7 @@
         <td v-if="lastNav === '/edit'">{{data.substr(0, 100)}}</td>
         <td v-if="rightPanel !== 'block'" v-bind:id="'edit-leftpaneltable-del'+index"><a href="#" v-on:click="delDoc(data, index)">删除</a></td>
         <td v-if="rightPanel !== 'block'" v-bind:id="'edit-leftpaneltable-edit'+index"><a href="#" v-on:click="loadDoc(data, index, 'edit')">编辑</a></td>
-        <td v-if="rightPanel !== 'block'" v-bind:id="'edit-leftpaneltable-ref'+index"><a href="#" v-on:click="loadDoc(data, index, 'show')">参考</a></td>
+        <td v-if="lastNav !== '/library' && rightPanel !== 'block'" v-bind:id="'edit-leftpaneltable-ref'+index"><a href="#" v-on:click="loadDoc(data, index, 'show')">参考</a></td>
         <td v-if="!fileName.includes('@') || rightPanel !== 'block'" v-bind:id="'edit-leftpaneltable-upl'+index"><a href="#" v-on:click="uploadDoc(data)">上传</a></td>
         <td v-if="fileName.includes('@')" v-bind:id="'edit-leftpaneltable-dow'+index"><a href="#" v-on:click="downloadDoc(data, index)">下载</a></td>
       </tr>
@@ -43,16 +43,24 @@
     computed: {
       isSave: {
         get() {
-          return this.$store.state.Edit.isSave
+          let type = this.$store.state.Edit.isSaveLocal
+          if (this.$store.state.Edit.rightPanel === 'local') {
+            type = this.$store.state.Edit.isSaveLocal
+          } else if (this.$store.state.Edit.rightPanel === 'server') {
+            type = this.$store.state.Edit.isSaveServer
+          }
+          return type
         }
       },
       lastNav: {
         get() {
+          console.log(this.$store.state.Edit.lastNav)
           return this.$store.state.Edit.lastNav
         }
       },
       rightPanel: {
         get() {
+          console.log(this.$store.state.Edit.rightPanel)
           return this.$store.state.Edit.rightPanel
         }
       },
@@ -133,8 +141,8 @@
           this.$store.commit('SET_NOTICE', '未登录用户,请在系统服务-用户设置内登录');
         } else {
           this.$store.commit('EDIT_SET_FILE_INDEX', index)
-          // obj, data, fileName, content, id, username, doctype, mouldtype
-          saveEdit(this, [this.$store.state.System.server, this.$store.state.System.port], this.$store.state.Edit.files[this.$store.state.Edit.filesIndex], [data], '', this.$store.state.System.user.username, 1, this.$store.state.Edit.docType, '病案')
+          // obj, data, fileName, content, id, saveType, username, doctype, mouldtype
+          saveEdit(this, [this.$store.state.System.server, this.$store.state.System.port], this.$store.state.Edit.files[this.$store.state.Edit.filesIndex], [data], '', '上传', this.$store.state.System.user.username, 1, this.$store.state.Edit.docType, '病案')
         }
         const date = new Date();
         let month = date.getMonth() + 1;

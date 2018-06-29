@@ -58,19 +58,20 @@ export function getEdit(obj, data, filename, serverType = 'server', type = '') {
   })
 }
 
-export function saveEdit(obj, data, fileName, content, id, username, doctype, mouldtype) {
+export function saveEdit(obj, data, fileName, content, id, saveType, username, doctype, mouldtype) {
   content = content[0]
   const url = `http://${data[0]}:${data[1]}/edit/cda`
   const header = obj.$store.state.Edit.docHeader
   axios({
     method: 'post',
     url: url,
-    data: qs.stringify({ id: id, file_name: fileName, content: content, username: username, doctype: doctype, mouldtype: mouldtype, header: header }),
+    data: qs.stringify({ id: id, file_name: fileName, content: content, username: username, doctype: doctype, mouldtype: mouldtype, header: header, save_type: saveType }),
     headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
     responseType: 'json'
   }).then((res) => {
     if (res.status === 200) {
       if (res.data.success) {
+        console.log(res.data);
         obj.$store.commit('SET_NOTICE', res.data.info)
       } else {
         obj.$store.commit('SET_NOTICE', res.data.info)
@@ -240,22 +241,12 @@ export function editDocState(obj, doc) {
 }
 
 export function editDocShow(obj, data, value) {
-  const value1 = value.split(',')
-  const value2 = value1.map((x) => {
-    const x1 = x.split(' ')
-    return x1
-  })
-  let diag = []
-  value2.forEach((x) => {
-    if (x[0] === '初步诊断') {
-      diag = x
-    }
-  })
+  const value2 = value.split(',').map(x => x.split(' ')[1])
   axios({
     method: 'post',
     url: `http://${data[0]}:${data[1]}/edit/cda_consule`,
     headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-    data: qs.stringify({ diag: diag }),
+    data: qs.stringify({ diag: `["${value2.join('","')}"]` }),
     responseType: 'json'
   }).then((res) => {
     console.log(res);
@@ -263,5 +254,5 @@ export function editDocShow(obj, data, value) {
     console.log(err);
     obj.$store.commit('SET_NOTICE', '病案历史查询失败')
   })
-  console.log(diag)
+  // console.log(diag)
 }
