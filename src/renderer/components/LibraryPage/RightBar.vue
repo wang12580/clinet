@@ -43,19 +43,19 @@
           <a class="nav-link text-light" href="#" title="跳转到编辑来编辑该文件"> 编辑数据 <span class="sr-only">(current)</span></a>
         </li>
         <li v-if="this.$store.state.Library.tableType === 'server' && libraryList.time.length !== 0" class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle text-light" href="#" id="stat-right-dimension-value" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <a class="nav-link dropdown-toggle text-light" href="#" id="library-right-dimension-time" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             时间
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown" style="height: 10rem; overflow: auto">
-              <a v-for="(data, index) in libraryList.time" v-bind:key='index' v-on:click='selX(data, "time")' class="nav-link" href="#"  v-bind:id="'stat-td-tr'+index" > {{data}} <span class="sr-only">(current)</span></a>
+              <a v-for="(data, index) in libraryList.time" v-bind:key='index' v-on:click='selX(data, "time")' class="nav-link" href="#"  v-bind:id="'library-dimension-time-tr'+index" > {{data}} <span class="sr-only">(current)</span></a>
           </div>
         </li>
         <li v-if="this.$store.state.Library.tableType === 'server' && libraryList.version.length !== 0" class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle text-light" href="#" id="stat-right-dimension-value" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <a class="nav-link dropdown-toggle text-light" href="#" id="library-right-dimension-version" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             版本
           </a>
            <div class="dropdown-menu" aria-labelledby="navbarDropdown" style="height: 10rem; overflow: auto">
-              <a v-for="(data, index) in libraryList.version" v-bind:key='index' v-on:click='selX(data, "version")' class="nav-link" href="#"  v-bind:id="'stat-td-tr'+index" > {{data}} <span class="sr-only">(current)</span></a>
+              <a v-for="(data, index) in libraryList.version" v-bind:key='index' v-on:click='selX(data, "version")' class="nav-link" href="#"  v-bind:id="'library-dimension-version-tr'+index" > {{data}} <span class="sr-only">(current)</span></a>
           </div>
         </li>
         <li class="nav-item dropdown" v-if="this.$store.state.Library.tableType !== 'server'">

@@ -5,7 +5,7 @@ describe('StatLocalFile', function () {
   afterEach(utils.afterEach);
 
   it('Stat-本地文件测试', function () {
-    this.timeout(100000)
+    this.timeout(120000)
     // 1、点击login页面的login-button
     return this.app.client.click('#login')
     // 等待底部通知框出现'未注册用户登陆！'提示，进入Home页
@@ -17,7 +17,8 @@ describe('StatLocalFile', function () {
       .click('#stat-file-dropdown')
       .click('#stat-file-本地')
     // 2.1.1 点击leftPanel列表 rightPanel数据表显示当前文件的前十条数据 chart显示当前数据图表 提示显示当前数据提示内容
-      .click('#stat-left-file-tr0')
+      .click('#stat-left-file-tr2')
+      .pause(1000)
       .waitUntilTextExists('#notice-bar', 'CSV文件读取成功！')
       .getText('.stat-right-table-tr')
       .then(function (rightTable) {
@@ -170,6 +171,7 @@ describe('StatLocalFile', function () {
         expect(time).to.be.an('array');
       })
       .click('.stat-left-dimension-tr')
+      .pause(1000)
       .getText('.stat-right-table-tr')
       .then(function (time) {
         expect(time).to.be.an('array');
@@ -177,17 +179,17 @@ describe('StatLocalFile', function () {
     // 2.1.1.1.9.2 点击机构 leftPanel显示可选机构维度
       .click('#stat-right-dimension')
       .click('#stat-td-tr1')
-      .pause(1000)
-      .getText('.stat-left-dimension-tr')
-      .then(function (org) {
-        console.log(org)
-        expect(org).to.be.an('string');
-      })
-      .click('.stat-left-dimension-tr')
-      .getText('.stat-right-table-tr')
-      .then(function (org) {
-        expect(org).to.be.an('array');
-      })
+      // // .pause(1000)
+      // .getText('.stat-left-dimension-tr')
+      // .then(function (org) {
+      //   console.log(org)
+      //   expect(org).to.be.an('string');
+      // })
+      // .click('.stat-left-dimension-tr')
+      // .getText('.stat-right-table-tr')
+      // .then(function (org) {
+      //   expect(org).to.be.an('array');
+      // })
     // 2.1.1.1.9.3 点击病种 leftPanel显示可选病种维度
       // .click('#stat-right-dimension')
       // .click('##stat-td-tr2')

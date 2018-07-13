@@ -17,10 +17,12 @@
         </tr>
       </table>
       <nav aria-label="Page navigation example" v-if="this.$store.state.Library.tableType === 'server'">
-        <ul class="pagination">
-          <li class="page-item" v-for= "(value, index) in page.pageList" v-bind:key="index" v-bind:class="{'disabled':value.page == page.page}" v-on:click="serverPage(value.page)"><a class="page-link" href="#">
-            {{value.num}}
-          </a></li>
+        <ul class="pagination">v-bind:id="'library-dimension-time-tr'+index"
+          <li class="page-item" v-for= "(value, index) in page.pageList" v-bind:key="index" v-bind:class="{'disabled':value.page == page.page}" v-on:click="serverPage(value.page)" v-bind:id="'library-server-page'+index">
+            <a class="page-link" href="#">
+              {{value.num}}
+            </a>
+          </li>
         </ul>
       </nav>
     </div>

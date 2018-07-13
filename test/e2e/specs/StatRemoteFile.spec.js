@@ -214,8 +214,24 @@ describe('StatRemoteFile', function () {
       })
     // 2.2.1.1.9 点击工具栏的维度选择 下拉框显示可选维度
     // 2.2.1.1.9.1 点击时间 leftPanel显示可选机构维度
-      .click('#stat-right-dimension')
-      .click('#stat-td-tr0')
+      .click('#stat-right-org')
+      .click('#stat-org-tr0')
+      .getText('.stat-right-table-tr')
+      .then(function (time) {
+        expect(time).to.be.an('array');
+      })
+      .click('#stat-right-time')
+      .click('#stat-time-tr0')
+      .getText('.stat-right-table-tr')
+      .then(function (time) {
+        expect(time).to.be.an('array');
+      })
+      .click('#stat-right-drg')
+      .click('#stat-drg-tr0')
+      .getText('.stat-right-table-tr')
+      .then(function (time) {
+        expect(time).to.be.an('array');
+      })
     //   .getText('.stat-left-dimension-tr')
     //   .then(function (time) {
     //     expect(time).to.be.an('array');

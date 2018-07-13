@@ -33,6 +33,7 @@ describe('LibraryBlockFile', function () {
       })
     // 2.1.6.1、点击左侧列表(library-leftlist)，读取数据文件内容，右侧表中显示所选区块链文件内容
       .click('.library-leftlist')
+      // .puash(1000)
       .getHTML('.library-rightpanel')
       .then(function (rightpanel) {
         expect(rightpanel).to.be.an('array');

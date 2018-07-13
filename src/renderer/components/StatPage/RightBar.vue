@@ -88,27 +88,27 @@
           </div>
         </li>
         <li v-if="this.$store.state.Stat.tableType === 'server'" class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle text-light" href="#" id="stat-right-dimension-value" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <a class="nav-link dropdown-toggle text-light" href="#" id="stat-right-org" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             机构
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown" style="height: 200px; overflow: auto">
-              <a v-for="(data, index) in this.$store.state.Stat.statList.org" v-bind:key='index' v-on:click='selX(data, "org")' class="nav-link" href="#"  v-bind:id="'stat-td-tr'+index" > {{data}} <span class="sr-only">(current)</span></a>
+              <a v-for="(data, index) in this.$store.state.Stat.statList.org" v-bind:key='index' v-on:click='selX(data, "org")' class="nav-link" href="#"  v-bind:id="'stat-org-tr'+index" > {{data}} <span class="sr-only">(current)</span></a>
           </div>
         </li>
         <li v-if="this.$store.state.Stat.tableType === 'server'" class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle text-light" href="#" id="stat-right-dimension-value" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <a class="nav-link dropdown-toggle text-light" href="#" id="stat-right-time" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             时间
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown" style="height: 200px; overflow: auto">
-              <a v-for="(data, index) in this.$store.state.Stat.statList.time" v-bind:key='index' v-on:click='selX(data, "time")' class="nav-link" href="#"  v-bind:id="'stat-td-tr'+index" > {{data}} <span class="sr-only">(current)</span></a>
+              <a v-for="(data, index) in this.$store.state.Stat.statList.time" v-bind:key='index' v-on:click='selX(data, "time")' class="nav-link" href="#"  v-bind:id="'stat-time-tr'+index" > {{data}} <span class="sr-only">(current)</span></a>
           </div>
         </li>
         <li v-if="this.$store.state.Stat.tableType === 'server'" class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle text-light" href="#" id="stat-right-dimension-value" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <a class="nav-link dropdown-toggle text-light" href="#" id="stat-right-drg" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             病种
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown" style="height: 200px; overflow: auto">
-              <a v-for="(data, index) in this.$store.state.Stat.statList.drg" v-bind:key='index' v-on:click='selX(data, "drg")' class="nav-link" href="#"  v-bind:id="'stat-td-tr'+index" > {{data}} <span class="sr-only">(current)</span></a>
+              <a v-for="(data, index) in this.$store.state.Stat.statList.drg" v-bind:key='index' v-on:click='selX(data, "drg")' class="nav-link" href="#"  v-bind:id="'stat-drg-tr'+index" > {{data}} <span class="sr-only">(current)</span></a>
           </div>
         </li>
       </ul>
