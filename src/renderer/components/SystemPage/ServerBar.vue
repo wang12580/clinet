@@ -12,18 +12,9 @@
         <li class="nav-item active" v-on:click='getUsers()' id="server-user-setup">
           <a class="nav-link text-light" href="#"> 用户设置 <span class="sr-only">(current)</span></a>
         </li>
-        <!-- <li v-if="toolbar === 'getUsers' && user.login === false">
-          <a class="nav-link text-light" href="#" v-on:click="loginUser()" id="server-login">登录</a>
-        </li> -->
-        <!-- <li v-if="toolbar === 'getUsers' && user.login === false">
-          <a class="nav-link text-light" href="#" v-on:click="insertUserPage()">新建</a>
-        </li> -->
         <li v-if="toolbar === 'getUsers' && user.login === true" id = "server-user-change">
           <a class="nav-link text-light" href="#" v-on:click="updateUserPage()">修改</a>
         </li>
-        <!-- <li v-if="toolbar === 'createUsers'">
-          <a class="nav-link text-light" href="#" v-on:click="insertUser()">注册</a>
-        </li> -->
         <li v-if="toolbar === 'upUsers'" id = "server-user-ischange">
           <a class="nav-link text-light" href="#" v-on:click="updateUser()">确认修改</a>
         </li>
@@ -63,23 +54,14 @@
         <li class="nav-item active" v-if="this.$store.state.System.userPower === 1 && toolbar === 'getPersons' && orgPage === 'getPerson'" v-on:click="updatePerson()">
           <a class="nav-link text-light" href="#"> 人员修改 <span class="sr-only">(current)</span></a>
         </li>
-        <li class="nav-item active" v-on:click='upHelp()'>
-          <a class="nav-link text-light" href="#"> 增加帮助功能 <span class="sr-only">(current)</span></a>
-        </li>
-        <!-- <li class="nav-item active" v-on:click='getServerFunctions' id="server-remote-function-setup">
-          <a class="nav-link text-light" href="#"> 远程服务功能设置 <span class="sr-only">(current)</span></a>
-        </li> -->
       </ul>
-      <!-- <div class="form-inline my-2 my-lg-0" v-if="['getPersons', 'getOrgs'].includes(this.$store.state.System.toolbar)">
-        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" id="server-search">
-      </div> -->
     </div>
   </nav>
 </template>
 
 <script>
   import { sGetOrg, sGetProvince, sGetUsers, sUpdateUser,
-    sCreateOrg, sUpdateOrg, sGetDepart, sCreateDepart, sUpdateDepart, sUpHelp } from '../../utils/Server';
+    sCreateOrg, sUpdateOrg, sGetDepart, sCreateDepart, sUpdateDepart } from '../../utils/Server';
   // import { open } from '../../utils/BlockAccount'
   import loadFile from '../../utils/LoadFile';
   // import { socketConnect } from '../../utils/Socket';
@@ -218,37 +200,6 @@
           }
         }
       },
-      // loginUser: function () {
-      //   const reg = /^([0-9A-Za-z\-_.]+)@([0-9a-z]+\.[a-z]{2,3}(\.[a-z]{2})?)$/g
-      //   const user = this.userLogin
-      //   if (reg.test(user.username)) {
-      //     this.$store.commit('SYSTEM_SET_SERVER', this.$store.state.System.file[1].split(','))
-      //     socketConnect(this, [this.server, this.port, user.username, user.password])
-      //   } else if (Array.from(user.username.split(' ')).length === 12) {
-      //     const key = Object.keys(global.hitbdata.blockchain)[0]
-      //     const server = global.hitbdata.blockchain[key][0];
-      //     this.$store.commit('BLOCK_SET_SERVER', server)
-      //     open(this, [server[0], server[1], user.username]);
-      //   }
-      // },
-      // insertUserPage: function () {
-      //   this.$store.commit('SYSTEM_SET_TOOLBAR', 'createUsers')
-      // },
-      // insertUser: function () {
-      //   this.$store.commit('SYSTEM_SET_SERVER', this.$store.state.System.file[1].split(','))
-      //   // 邮箱,密码,年龄.电话
-      //   const reg = /^([0-9A-Za-z\-_.]+)@([0-9a-z]+\.[a-z]{2,3}(\.[a-z]{2})?)$/g
-      //   let a = 1;
-      //   if (reg.test(this.registerInfo.email)) {
-      //     a = 1
-      //   } else {
-      //     a = 0
-      //     this.$store.commit('SET_NOTICE', '用户名或邮箱输入错误');
-      //   }
-      //   if (a === 1) {
-      //     sRegister(this, [this.server, this.port, this.registerInfo])
-      //   }
-      // },
       updateUserPage: function () {
         this.$store.commit('SYSTEM_SET_TOOLBAR', 'createUsers')
       },
@@ -297,9 +248,6 @@
       },
       updateDep: function () {
         sUpdateDepart(this, [this.$store.state.System.server, this.$store.state.System.port], this.depId, this.departmentInfo);
-      },
-      upHelp: function () {
-        sUpHelp(this, [this.$store.state.System.server, this.$store.state.System.port], '编辑器帮助', '')
       }
     },
   };

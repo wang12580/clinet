@@ -119,6 +119,7 @@
           if (!this.$store.state.System.user.login) {
             this.$store.commit('SET_NOTICE', '未登录用户,请在系统服务-用户设置内登录');
           } else {
+            console.log('1231213')
             this.$store.commit('SET_NOTICE', '远程文件');
             this.$store.commit('LIBRARY_SET_TABLE_TYPE', 'server');
             this.$store.commit('LIBRARY_SET_LEFT_PANEL', ['file', null]);
@@ -168,7 +169,7 @@
           this.$store.commit('SET_NOTICE', '当前已是尾页');
         } else if (this.$store.state.Library.tableType === 'server' || this.$store.state.Library.tableType === 'block') {
           this.$store.commit('LIBRARY_TABLE_PAGE', [n]);
-          getLibrary(this, [this.$store.state.System.server, this.$store.state.System.port], this.$store.state.Library.serverTable.tableName, this.$store.state.Library.tablePage, this.$store.state.Library.dimensionType, this.$store.state.Library.dimensionServer, 'library', this.$store.state.Library.tableType)
+          getLibrary(this, [this.$store.state.System.server, this.$store.state.System.port], this.$store.state.Library.serverTable.tableName, this.$store.state.Library.tablePage, this.$store.state.Library.dimensionType, this.$store.state.Library.dimensionServer, 'library', this.$store.state.Library.tableType, [])
         } else if (this.$store.state.Library.tableType === 'local') {
           this.$store.commit('LIBRARY_TABLE_PAGE', [n]);
           this.$store.commit('SET_NOTICE', `当前${this.$store.state.Library.tablePage}页,共${this.$store.state.Library.countPage}页`)
@@ -208,7 +209,7 @@
         switch (this.$store.state.Library.tableType) {
           case 'local': {
             if (this.$store.state.Library.localTable.length > 0) {
-              switch (x) {
+              switch (value) {
                 case '全部':
                   this.$store.commit('LIBRARY_SET_LEFT_PANEL', ['file', null]);
                   loadFile(this, this.$store.state.Library.files[this.$store.state.Library.fileIndex], 'library')
@@ -231,21 +232,7 @@
           case 'server': {
             if (this.$store.state.Library.serverTable.tableName) {
               this.$store.commit('LIBRARY_SET_SERVER_DIMENSION', [value, x]);
-              console.log(this.$store.state.Library.serverDimension)
-              getLibrary(this, [this.$store.state.System.server, this.$store.state.System.port], this.$store.state.Library.serverTable.tableName, 1, 'filter', this.$store.state.Library.serverDimension, 'edit', 'server')
-              // getList()
-              // switch (x) {
-              //   case '全部':
-              //     this.$store.commit('LIBRARY_SET_LEFT_PANEL', ['file', null]);
-              //     getLibrary(this, [this.$store.state.System.server, this.$store.state.System.port], this.$store.state.Library.serverTable.tableName, this.$store.state.Library.tablePage, this.$store.state.Library.dimensionType, this.$store.state.Library.dimensionServer, 'library', 'block')
-              //     break;
-              //   case 'time': case 'version':
-              //     this.$store.commit('LIBRARY_SET_LEFT_PANEL', ['file', null]);
-              //     getLibrary(this, [this.$store.state.System.server, this.$store.state.System.port], this.$store.state.Library.serverTable.tableName, 1, x, value, 'edit', 'server')
-              //     // getList(this, [this.$store.state.System.server, this.$store.state.System.port], this.$store.state.Library.serverTable.tableName, 'time', this.$store.state.System.user.username)
-              //     break;
-              //   default:
-              // }
+              getLibrary(this, [this.$store.state.System.server, this.$store.state.System.port], this.$store.state.Library.serverTable.tableName, 1, 'filter', this.$store.state.Library.serverDimension, 'edit', 'server', [])
             } else {
               this.$store.commit('SET_NOTICE', '请选择文件');
             }

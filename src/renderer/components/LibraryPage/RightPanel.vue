@@ -10,13 +10,19 @@
       </table> -->
       <table>
         <tr>
-          <td v-for="(field, index) in this.$store.state.Library.title" v-bind:key='index'>{{field}}</td>
+          <td v-for="(field, index) in this.$store.state.Library.title" v-bind:key='index'>
+              {{field}}
+          </td>
         </tr>
         <tr v-for="(data, index) in xs" v-bind:key='index' v-on:click="onClick(data, index)" v-bind:class="{'table-danger': rowHeight == index}" class="library-rightpanel">
-          <td v-for="(field, index) in data" v-bind:key='index'>{{data[index]}}</td>
+          <td v-for="(field, index1) in data" v-bind:key='index1' >
+            <a href="#" class="oi oi-sort-ascending" v-if="index === 0 && tableType === 'server'" v-on:click="sort('asc', data[index1])"></a>
+              {{data[index1]}}
+            <a href="#" class="oi oi-sort-descending" v-if="index === 0 && tableType === 'server'" v-on:click="sort('desc', data[index1])"></a>
+          </td>
         </tr>
       </table>
-      <nav aria-label="Page navigation example" v-if="this.$store.state.Library.tableType === 'server'">
+      <nav aria-label="Page navigation example" v-if="tableType === 'server'">
         <ul class="pagination">
           <li class="page-item" v-for= "(value, index) in page.pageList" v-bind:key="index" v-bind:class="{'disabled':value.page == page.page}" v-on:click="serverPage(value.page)"><a class="page-link" href="#">
             {{value.num}}
@@ -79,6 +85,11 @@
         get() {
           return this.$store.state.Library.fieldIndex
         }
+      },
+      tableType: {
+        get() {
+          return this.$store.state.Library.tableType
+        }
       }
     },
     methods: {
@@ -92,8 +103,11 @@
       serverPage: function (data) {
         const page = parseInt(data, 10)
         this.$store.commit('LIBRARY_SET_TABLE_PAGE', page);
-        getLibrary(this, [this.$store.state.System.server, this.$store.state.System.port], this.$store.state.Library.serverTable.tableName, page, this.$store.state.Library.dimensionType, this.$store.state.Library.dimensionServer, 'library', this.$store.state.Library.tableType)
+        getLibrary(this, [this.$store.state.System.server, this.$store.state.System.port], this.$store.state.Library.serverTable.tableName, page, 'filter', this.$store.state.Library.serverDimension, 'library', this.$store.state.Library.tableType, ['asc', '编码'])
         // getLibrary(obj, data, tableName, pageNum, dimensionType, dimensionServer, type1, serverType = 'server'
+      },
+      sort: function (type, value) {
+        getLibrary(this, [this.$store.state.System.server, this.$store.state.System.port], this.$store.state.Library.serverTable.tableName, 1, 'filter', this.$store.state.Library.serverDimension, 'library', this.$store.state.Library.tableType, [type, value])
       }
     },
   };
