@@ -293,11 +293,16 @@ export function getExpertHint(obj, data, value) {
     data: qs.stringify({ symptom: values }),
     responseType: 'json'
   }).then((res) => {
-    obj.$store.commit('EDIT_SET_EXPERT_HINT', res.data.result)
+    // console.log(res.data.result)
+    if (res.data.result.length === 0) {
+      obj.$store.commit('SET_NOTICE', '当前内容无专家提示')
+    } else {
+      obj.$store.commit('EDIT_SET_EXPERT_HINT', res.data.result)
+    }
     // obj.$store.commit('EDIT_LOAD_DOC_SHOW', res.data.cda)
   }).catch((err) => {
     console.log(err);
-    obj.$store.commit('SET_NOTICE', '病案历史查询失败')
+    obj.$store.commit('SET_NOTICE', '专家提示查询失败')
   })
   console.log(hd)
 }
